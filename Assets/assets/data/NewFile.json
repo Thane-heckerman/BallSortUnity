@@ -1,0 +1,46 @@
+﻿{
+    "levels": [
+        {
+            "level": 1,
+            "tubes": [
+                { "ballList": [ 1, 2, 1, 2 ] },
+                { "ballList": [ 1, 2, 1, 2 ] },
+                { "ballList": [] }
+            ]
+        },
+        {
+            "level": 2,
+            "tubes": [
+                { "ballList": [ 2, 2, 1, 2 ] },
+                { "ballList": [ 1, 2, 1, 1 ] },
+                { "ballList": [] }
+            ]
+        },
+        {
+            "level": 3,
+            "tubes": [
+                { "ballList": [ 2, 1, 2 ] },
+                { "ballList": [ 1, 2, 1, 1 ] },
+                { "ballList": [ 2 ] }
+            ]
+        },
+        {
+            "level": 4,
+            "tubes": [
+                { "ballList": [ 2, 2, 1, 2 ] },
+                { "ballList": [ 1, 2 ] },
+                { "ballList": [ 1, 1 ] },
+                { "ballList": [] }
+            ]
+        },
+        {
+            "level": 5,
+            "tubes": [
+                { "ballList": [ 2, 2, 1 ] },
+                { "ballList": [ 1, 2, 1 ] },
+                { "ballList": [ 2, 1 ] },
+                { "ballList": [] }
+            ]
+        }
+    ]
+}
