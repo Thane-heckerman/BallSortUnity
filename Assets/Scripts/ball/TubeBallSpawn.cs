@@ -40,15 +40,15 @@ public class TubeBallSpawn : MonoBehaviour
         return this.ballPosList;
     }
 
-    public void Spawn(List<int> tube)//spawn balll phải viết cho ông thứ i
-    {
-        for (int i = 0; i < tube.Count ; i++)
-        {
-            GameObject ballClone = Instantiate(ballTypeList.ballTypeList[tube[i]].prefab.gameObject, ballPosList[i].transform.position, ballPosList[i].transform.rotation);
-            ballClone.SetActive(true);
-            this.listBall.Add(ballClone);
-        }
-    }
+    //public void Spawn(List<int> tube)
+    //{
+    //    for (int i = 0; i < tube.Count ; i++)
+    //    {
+    //        //GameObject ballClone = Instantiate(ballTypeList.ballTypeList[tube[i]].prefab.gameObject, ballPosList[i].transform.position, ballPosList[i].transform.rotation);
+    //        ballClone.SetActive(true);
+    //        this.listBall.Add(ballClone);
+    //    }
+    //}
 
     private GameObject GetLastBallInTube()
     {
@@ -134,13 +134,7 @@ public class TubeBallSpawn : MonoBehaviour
     private List<string> GetBallsName()
     {
         List<string> listBallsName = new List<string>();
-
-        for (int i = 0; i < this.listBall.Count; i++)
-        {
-            string ballName = this.listBall[i].name;
-            Debug.Log(ballName);
-            listBallsName.Add(ballName);
-        }
+        
         return listBallsName;
     }
 }
