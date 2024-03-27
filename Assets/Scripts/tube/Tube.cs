@@ -74,18 +74,19 @@ public class Tube : MonoBehaviour
 
         return false;
     }
-    //public int GetFirstEmtyBallPos()
-    //{
-    //    if (!HasNoBall())
-    //    {
-    //        BallPos ballPos = ballPosList.First(i => !i.IsContainBall());
-    //        return ballPos.ballPosData.index;
-    //    }
-    //    else
-    //    {
-    //        return 0;
-    //    }
-    //}
+
+    public int GetFirstEmtyBallPos()
+    {
+        if (HasBall())
+        {
+            BallPos ballPos = ballPosList.First(i => !i.IsContainBall());
+            return ballPos.ballPosData.index;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 
     public Transform GetUpBallPos()
     {

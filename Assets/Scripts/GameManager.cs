@@ -5,6 +5,7 @@ using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UIElements;
 
 public enum GameState {
     NONE,
@@ -81,81 +82,24 @@ public class GameManager : MonoBehaviour
     public void LoadLevel()
     {
         TubesNumber = levelManager.levelDataContainer.levelData.fields[0].tubes.Count;
-        InitGamePlay(TubesNumber);
-
+        //InitGamePlay(TubesNumber);
+        InitGameField();
     }
 
-    private void InitGamePlay(int tubesNumber)
+    private void InitGameField()
     {
-
-        if (tubesNumber <= maxTubeInOneLine)
-        {
-            SpawnTubeRow(tubesNumber, 0,0);
-        }
-
-        float screenHeight = Screen.height;
-        if (tubesNumber > maxTubeInOneLine)
-        {
-            int startIndex = 0;
-            rows = 2;
-            float rowHeight = screenHeight / 3;
-            Vector2 position = mainCamera.ScreenToWorldPoint(new Vector2(0, rowHeight));
-            List<float> yPositionList = new List<float>() { -position.y,position.y};
-            int remainingTube = tubesNumber;
-            if (tubesNumber % 2 != 0)
-            {
-                
-                int lineOneTube = tubesNumber / 2 + 1;
-                for (int i = 0; i < rows; i++)
-                {
-                    float spawnY = yPositionList[i];
-                    
-                    SpawnTubeRow(lineOneTube, spawnY, startIndex);
-                    remainingTube -= lineOneTube;
-                    ;
-                    if (remainingTube > 0)
-                    {
-                        lineOneTube = remainingTube;
-                        startIndex = tubesNumber - lineOneTube + 1;
-                    }
-                }
-            }
-            
-            if (tubesNumber % 2 == 0)
-            {
-                int lineOneTube = tubesNumber / 2;
-                for (int i = 0; i < rows; i++)
-                {
-                    float spawnY = yPositionList[i]; 
-                    SpawnTubeRow(lineOneTube, spawnY, startIndex); 
-                    remainingTube -= lineOneTube;
-                    
-                    if (remainingTube > 0)
-                    {
-                        lineOneTube = remainingTube;
-                        startIndex = tubesNumber - lineOneTube + 1;
-                    }
-
-                }
-            }
-        }
+        SetTubePosition(TubesNumber);
+        InitTube();
+        InitBallPos();
     }
 
-    private void SpawnTubeRow(int tubeNeedSpawn ,  float spawnY, int startIndex)
+    
+    private void InitBallPos()
     {
-        xSpacing = CalculateSpacing(tubeNeedSpawn);
-        float screenHalfWidth = mainCamera.aspect * mainCamera.orthographicSize;
-        // calculate spacing between tube based on screen size
-        for (int i = 0; i < tubeNeedSpawn; i++)
+        for (int i = 0; i < runtimeListTube.Count; i++)
         {
-            float xPosition = (i * xSpacing) - ((tubeNeedSpawn - 1) * xSpacing / 2.0f);
-            xPosition = Mathf.Clamp(xPosition, -screenHalfWidth + tubePrefabs[i].transform.localScale.x / 2.0f + offSet, screenHalfWidth - tubePrefabs[i].transform.localScale.x / 2.0f - offSet);
-            Vector3 position = new Vector3(xPosition, spawnY, 0);
-            Tube tube = Tube.Create(tubePrefabs[i], position, startIndex);
-            tube.tubeData.SetIndex(startIndex);
-            tube.InitBallPos();
             List<TubesForEditor> tubesForEditors = gameFieldData.tubes;
-            List<BallPos> listBallPos = tube.GetBallPosList();
+            List<BallPos> listBallPos = runtimeListTube[i].GetBallPosList();
             for (int j = 0; j < listBallPos.Count; j++)
             {
                 if (tubesForEditors[i].listBallPost[j].itemForEditor.ballType != null)
@@ -165,14 +109,101 @@ public class GameManager : MonoBehaviour
                     ball.ballData.SetBallType(tubesForEditors[i].listBallPost[j].itemForEditor.ballType);
                     ball.SetIndex(j);
                     listBallPos[j].ballPosData.SetBallObj(ball);
-                    listBallPos[j].ballPosData.SetData(tube.GetTubeIndex(), j, listBallPos[j].transform.position) ;
+                    listBallPos[j].ballPosData.SetData(runtimeListTube[i].GetTubeIndex(), j, listBallPos[j].transform.position);
                     colorableComponent.SetTypeSprite(tubesForEditors[i].listBallPost[j].itemForEditor.ballType);
                     runtimeListBall.Add(ball);
                 }
             }
-            startIndex++;
+        }
+    }
+
+    private void InitTube()
+    {
+        List<Vector2> positions = SetTubePosition(TubesNumber);
+        for (int i = 0; i < positions.Count; i++)
+        {
+            Tube tube = Tube.Create(tubePrefabs[i], positions[i],i);
+            tube.tubeData.SetIndex(i);
+            // spawn ball pos
+            tube.InitBallPos();
             runtimeListTube.Add(tube);
         }
+        
+    }
+
+    private List<Vector2> SetTubePosition(int tubeNeedSpawn)
+    {
+        List<Vector2> tubePositions = new List<Vector2>();
+        if (tubeNeedSpawn <= maxTubeInOneLine)
+        {
+            tubePositions = SetTubePositionForEachRow(tubeNeedSpawn, 0, 0);
+        }
+
+        // spawn tube position
+        float screenHeight = Screen.height;
+        if (tubeNeedSpawn > maxTubeInOneLine)
+        {
+            int startIndex = 0;
+            rows = 2;
+            float rowHeight = screenHeight / 3;
+            Vector2 position = mainCamera.ScreenToWorldPoint(new Vector2(0, rowHeight));
+            List<float> yPositionList = new List<float>() { -position.y, position.y };
+            int remainingTube = tubeNeedSpawn;
+            if (tubeNeedSpawn % 2 != 0)
+            {
+
+                int lineOneTube = tubeNeedSpawn / 2 + 1;
+                for (int i = 0; i < rows; i++)
+                {
+                    float spawnY = yPositionList[i];
+                    tubePositions.AddRange(SetTubePositionForEachRow(lineOneTube, spawnY, startIndex));
+                    remainingTube -= lineOneTube;
+                    
+                    if (remainingTube > 0)
+                    {
+                        lineOneTube = remainingTube;
+                        startIndex = tubeNeedSpawn - lineOneTube + 1;
+                    }
+                }
+            }
+
+            if (tubeNeedSpawn % 2 == 0)
+            {
+                int lineOneTube = tubeNeedSpawn / 2;
+                for (int i = 0; i < rows; i++)
+                {
+                    float spawnY = yPositionList[i];
+                    tubePositions.AddRange(SetTubePositionForEachRow(lineOneTube, spawnY, startIndex));
+                    remainingTube -= lineOneTube;
+
+                    if (remainingTube > 0)
+                    {
+                        lineOneTube = remainingTube;
+                        startIndex = tubeNeedSpawn - lineOneTube + 1;
+                    }
+
+                }
+            }
+        }
+        return tubePositions;
+    }
+
+    private List<Vector2> SetTubePositionForEachRow(int tubeNeedSpawn, float spawnY, int startIndex)
+    {
+        List<Vector2> tubePostitions = new List<Vector2>();
+        xSpacing = CalculateSpacing(tubeNeedSpawn);
+        float screenHalfWidth = mainCamera.aspect * mainCamera.orthographicSize;
+        // calculate spacing between tube based on screen size
+        for (int i = 0; i < tubeNeedSpawn; i++)
+        {
+            //spawn tube
+            float xPosition = (i * xSpacing) - ((tubeNeedSpawn - 1) * xSpacing / 2.0f);
+            xPosition = Mathf.Clamp(xPosition, -screenHalfWidth + tubePrefabs[i].transform.localScale.x / 2.0f + offSet, screenHalfWidth - tubePrefabs[i].transform.localScale.x / 2.0f - offSet);
+            Vector3 position = new Vector3(xPosition, spawnY, 0);
+            startIndex++;
+            tubePostitions.Add(position);
+        }
+        return tubePostitions;
     }
 
     private void Update()
