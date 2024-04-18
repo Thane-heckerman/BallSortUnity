@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8aba2c97d7bd0471a9911e88d6089d5c, type: 3}
+  m_Name: BallTypeList_6
+  m_EditorClassIdentifier: 
+  ballTypeList:
+  - {fileID: 11400000, guid: ba2c16b2e30ab401abb49eb91b58abe7, type: 2}
+  - {fileID: 11400000, guid: 84d1175b87491456db9f88efcb041458, type: 2}
+  - {fileID: 11400000, guid: 87827a0224cc141cf9e65f060830f015, type: 2}
+  - {fileID: 11400000, guid: d3a68b37141dc4d1e848592891c87796, type: 2}
+  - {fileID: 11400000, guid: 47e2586647ea242fab363e223e2e14d2, type: 2}
+  - {fileID: 11400000, guid: cff9bb7a632504b56a81138cf4d5c417, type: 2}
+  - {fileID: 11400000, guid: 29308b8ac8d0d4cbc9894d133486d980, type: 2}

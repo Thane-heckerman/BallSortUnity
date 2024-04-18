@@ -41,24 +41,25 @@ public static class ScriptableLevelManager
 
     public static LevelData LoadLevel(int level)
     {
-        var levelScriptable = Resources.Load("Level " + level) as LevelDataContainer;
+        var levelScriptable = Resources.Load("Levels/Level_" + level) as LevelDataContainer;
         LevelData levelData;
         if (levelScriptable)
         {
             levelData = levelScriptable.levelData.DeepCopy(level);
+            return levelData;
         }
         else
         {
             var levelScriptables = Resources.Load("Levels/LevelListScriptable") as LevelListScriptable; //<= this is a list of levels scriptableobject
-            var ld = levelScriptables.LevelDataContainers[level - 1].levelData;
+            var ld = levelScriptables.LevelDataContainers[level-1].levelData;
             if (ld != null)
             {
                 levelData = ld.DeepCopy(level);
+                return levelData;
             }
             else return default;
         }
 
-        return levelData;
     }
 
 

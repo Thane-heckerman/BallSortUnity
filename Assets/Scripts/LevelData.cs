@@ -6,10 +6,11 @@ using System.Linq;
 public class LevelData
 {
     public int intLevelNum;
-    public float timeLimit;
+    public int timeLimit;
     public Goal goalType;
     public List<GameFieldData> fields = new List<GameFieldData>();
     // for creating new level
+
     public LevelData DeepCopy(int level)
     {
         var other = (LevelData)MemberwiseClone();
@@ -99,11 +100,11 @@ public class BallPosLayer
 
 [System.Serializable]
 public class ItemForEditor {
-    public int Color;
     public BallTypeSO ballType;
     public Texture2D texture2D;
     public IColorableComponent colors;
     public GameObject ball;
+    public BallColor color;
 
     public ItemForEditor DeepCopy()
     {

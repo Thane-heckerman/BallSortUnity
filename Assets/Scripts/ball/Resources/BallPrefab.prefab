@@ -118,17 +118,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2ce6318ca04c479392b2c5df58ddbc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballData:
-    color: 0
-    ballType: {fileID: 0}
-    index: 0
-    position: {fileID: 0}
-    ball: {fileID: 0}
-  ballTypeList: {fileID: 11400000, guid: f419381d2bcdc48aeb36d18324944e07, type: 2}
+  ballRef: {fileID: 9154199289199708086}
+  ballTypeList: {fileID: 0}
   Sprites:
+  - level: 0
+    ballTypeListPerLevel: {fileID: 11400000, guid: f419381d2bcdc48aeb36d18324944e07, type: 2}
   - level: 1
-    spriteArray: []
-    ballTypeList: {fileID: 0}
+    ballTypeListPerLevel: {fileID: 11400000, guid: 8d96425afc3d840beb32f611bceca879, type: 2}
+  - level: 2
+    ballTypeListPerLevel: {fileID: 11400000, guid: 3202ec33e621f4a96bf637fa70703268, type: 2}
+  - level: 3
+    ballTypeListPerLevel: {fileID: 11400000, guid: 4cca1c1e6d2ef407685cff8e636a7c52, type: 2}
+  - level: 4
+    ballTypeListPerLevel: {fileID: 11400000, guid: 17a38cc56818d48129aa08c15033851a, type: 2}
+  - level: 5
+    ballTypeListPerLevel: {fileID: 11400000, guid: 3806f9a547bb54ca394c10435044b0a1, type: 2}
 --- !u!114 &244708384952367511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,8 +145,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe2532a576a5e4556b6e5c673ec33451, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ballState: 0
   targetPos: {x: 0, y: 0, z: 0}
   progress: 0
   currentPos: {x: 0, y: 0, z: 0}
   currentTargetIndex: 0
-  targetList: []

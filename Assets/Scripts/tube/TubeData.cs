@@ -9,6 +9,7 @@ public class TubeData
     public List<BallPos> ballPostList;
     public int maxBallPos = 4;
     public Tube tube;
+    public bool isCompleted;
 
     public void SetIndex(int index)
     {

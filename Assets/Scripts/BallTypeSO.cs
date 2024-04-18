@@ -5,14 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/BallType")]
 public class BallTypeSO : ScriptableObject
 {
-    public BallColor color
-    {
-        get { return color; }
-        set
-        {
-            color = value;
-        }
-    }
+    public BallColor color;
+    
     public string nameString;
     public Sprite sprite;
 }

@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class TestingScript : MonoBehaviour
 {
-    [SerializeField] private OnPressPEvent OnPressPEvent;
+
+    public LevelSO testLevel;
+
+    private void Awake()
+    {
+        
+    }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetMouseButtonDown(0))
         {
-            OnPressPEvent.Raise(new EventArgumentTest
-            {
-                value = 9
-            });
+            testLevel.MaxTubeNumber += 1;
         }
     }
 }

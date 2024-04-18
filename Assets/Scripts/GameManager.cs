@@ -1,4 +1,4 @@
-using System;
+ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
@@ -15,15 +15,17 @@ public enum GameState {
     OnFallingBallCompleted,
     OnGetBallBack,
     OnGetBallBackCompleted,
+    OnWin
 }
+
 
 public class GameManager : MonoBehaviour
 {
-
+    public LevelData levelData = new LevelData();
+    public static event EventHandler OnWin;
     private int tubeForAdding = 1;
-    private GameState gameState;
+    public GameState gameState { get; set; }
     public static GameManager Instance { get; private set; }
-    public LevelManager levelManager;
     private Camera mainCamera;
     private List<Transform> tubePrefabs = new List<Transform>();
     private GameFieldData gameFieldData;
@@ -31,70 +33,77 @@ public class GameManager : MonoBehaviour
     public Tube targetTube ;
     private List<Ball> runtimeListBall = new List<Ball>();
     private List<Tube> runtimeListTube = new List<Tube>();
-
-    private int levelSecondRowTubeNumber;
-
-    //public event EventHandler<OnTubeReceiveBallArgument> OnTubeReceiveBall;
-    //public class OnTubeReceiveBallArgument
-    //{
-    //    public List<Ball> ballList;
-    //}
-    //public event EventHandler<OnTubeClickEventArgument> OnTubeClickEvent;
-
-    //public class OnTubeClickEventArgument {
-    //    public List<int> indexList;
-    //}
-
     private List<Vector2> subTubePoses = new List<Vector2>();
     public List<Ball> ballTemp;
     private BallTypeSO tempBallType;
     [SerializeField] private TubeRuntimeSetList tubeRuntimeSetList;
     [SerializeField] private BallRuntimeSetList ballRuntimeSetList;
-    public int currentLevel;
     public int TubesNumber;
-    private int maxTubeInOneLine = 8;
+    private int maxTubeInOneLine = 5;
     private int rows;
     private float xSpacing ;
     private float offSet = .5f;
-    private bool isCompleteLevel;
+    private int target;
+    
     //public LevelManager levelManager;
 
     private void Awake()
     {
-        Instance = this;
-        gameFieldData = levelManager.levelDataContainer.levelData.fields[0];
-        foreach (var tube in gameFieldData.tubes)
-        {
-            tubePrefabs.Add(tube.TubePrefab.transform);
-        }
-    }
-
-    void Start()
-    {
+        //DontDestroyOnLoad(this.gameObject);
         mainCamera = Camera.main;
+        Instance = this;
+        Transform tubePrefab = Resources.Load<Transform>("TubesPrefab");
+        tubePrefabs.Add(tubePrefab);
 
-        LoadLevel();
+    }
+
+    public void SetGameState(GameState gameState)
+    {
+        this.gameState = gameState;
+    }
+
+    private void SetWinCondition()
+    {
+        target = gameFieldData.maxBallNumer;
+    }
+
+    //public void LoadLevel(int level)
+    //{
+    //    OnLoadLevel?.Invoke(this, EventArgs.Empty);
+    //    mainCamera = Camera.main;
+    //    currentLevel = levelData.intLevelNum;
+    //    TubesNumber = levelData.fields[0].tubes.Count;
+    //    gameFieldData = levelData.fields[0];
+    //    InitGameField();
+    //    SetWinCondition();
+    //}
+
+    private void OnEnable()
+    {
+        LevelManager.OnLevelLoaded += OnLevelLoaded;
+    }
+
+    private void OnDisable()
+    {
+        LevelManager.OnLevelLoaded -= OnLevelLoaded;
+    }
+
+    private void OnLevelLoaded()
+    {
         gameState = GameState.NONE;
-        
-        
-
-    }
-    public void LoadLevel()
-    {
-        TubesNumber = levelManager.levelDataContainer.levelData.fields[0].tubes.Count;
-        //InitGamePlay(TubesNumber);
-        InitGameField();
     }
 
-    private void InitGameField()
+    public void InitGameField() //tight coupling 
     {
+        gameFieldData = levelData.fields[0];
+        SetWinCondition();
         SetTubePosition(TubesNumber);
         InitTube();
-        InitBallPos();
+        InitBall();
     }
 
     
-    private void InitBallPos()
+    private void InitBall()
     {
         for (int i = 0; i < runtimeListTube.Count; i++)
         {
@@ -102,15 +111,15 @@ public class GameManager : MonoBehaviour
             List<BallPos> listBallPos = runtimeListTube[i].GetBallPosList();
             for (int j = 0; j < listBallPos.Count; j++)
             {
-                if (tubesForEditors[i].listBallPost[j].itemForEditor.ballType != null)
+                if (tubesForEditors[i].listBallPost[j].itemForEditor.color != BallColor.NONE)
                 {
                     Ball ball = Ball.Create(listBallPos[j].transform);
                     IColorableComponent colorableComponent = ball.GetComponent<IColorableComponent>();
-                    ball.ballData.SetBallType(tubesForEditors[i].listBallPost[j].itemForEditor.ballType);
+                    colorableComponent.SetSprite(tubesForEditors[i].listBallPost[j].itemForEditor.color);
                     ball.SetIndex(j);
+                    ball.transform.SetParent(this.transform);
                     listBallPos[j].ballPosData.SetBallObj(ball);
                     listBallPos[j].ballPosData.SetData(runtimeListTube[i].GetTubeIndex(), j, listBallPos[j].transform.position);
-                    colorableComponent.SetTypeSprite(tubesForEditors[i].listBallPost[j].itemForEditor.ballType);
                     runtimeListBall.Add(ball);
                 }
             }
@@ -119,14 +128,16 @@ public class GameManager : MonoBehaviour
 
     private void InitTube()
     {
+        
         List<Vector2> positions = SetTubePosition(TubesNumber);
         for (int i = 0; i < positions.Count; i++)
         {
-            Tube tube = Tube.Create(tubePrefabs[i], positions[i],i);
+            Tube tube = Tube.Create(tubePrefabs[0], positions[i],i);
             tube.tubeData.SetIndex(i);
             // spawn ball pos
-            tube.InitBallPos();
+            tube.InitBallPos(tube.testingSprite);
             runtimeListTube.Add(tube);
+            tube.transform.SetParent(this.transform);
         }
         
     }
@@ -198,7 +209,7 @@ public class GameManager : MonoBehaviour
         {
             //spawn tube
             float xPosition = (i * xSpacing) - ((tubeNeedSpawn - 1) * xSpacing / 2.0f);
-            xPosition = Mathf.Clamp(xPosition, -screenHalfWidth + tubePrefabs[i].transform.localScale.x / 2.0f + offSet, screenHalfWidth - tubePrefabs[i].transform.localScale.x / 2.0f - offSet);
+            xPosition = Mathf.Clamp(xPosition, -screenHalfWidth + tubePrefabs[0].transform.localScale.x / 2.0f + offSet, screenHalfWidth - tubePrefabs[0].transform.localScale.x / 2.0f - offSet);
             Vector3 position = new Vector3(xPosition, spawnY, 0);
             startIndex++;
             tubePostitions.Add(position);
@@ -210,7 +221,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
             if (hit.collider != null && hit.collider.GetComponent<Tube>() != null)
             {
@@ -219,11 +230,6 @@ public class GameManager : MonoBehaviour
         }
 
         CheckGameState();
-        if (Input.GetMouseButtonDown(1))
-        {
-            Debug.Log("RM pressed");
-            AddTube();
-        }
     }
 
     private void CheckGameState()
@@ -231,6 +237,7 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.NONE:
+                
             case GameState.OnPopBall:
                 {
                     if (selectedTube != null)
@@ -247,6 +254,8 @@ public class GameManager : MonoBehaviour
                 {
                     if (CheckBusyStateOfTube(selectedTube) && CheckBusyStateOfTube(targetTube))
                     {
+                        targetTube.CheckIsCompletedTube();
+
                         gameState = GameState.OnFallingBallCompleted;
                         Debug.Log("onFallingBallCompleted");
                         ResetSelection();
@@ -257,8 +266,13 @@ public class GameManager : MonoBehaviour
 
             case GameState.OnFallingBallCompleted:
                 {
-                    gameState = GameState.NONE;
-                    Debug.Log("GameState == none");
+                    
+                    if (IsCompleteLevel())
+                    {
+                        gameState = GameState.OnWin;
+                    }
+                    else gameState = GameState.NONE;
+                    
                 }
                 break;
 
@@ -289,6 +303,13 @@ public class GameManager : MonoBehaviour
                     gameState = GameState.NONE;
                 }
                 break;
+
+            case GameState.OnWin:
+                {
+                    gameState = GameState.NONE;
+                    // gọi LevelManager Onwin complete level and save playerpref
+                }
+                break;
         }
     }
 
@@ -304,7 +325,7 @@ public class GameManager : MonoBehaviour
         {
             case GameState.NONE:
 
-                if (!runtimeListTube[tubeIndex].IsCompletedTube())
+                if (!runtimeListTube[tubeIndex].tubeData.isCompleted)
                 {
                     selectedTube = runtimeListTube[tubeIndex];
                     if (runtimeListTube[tubeIndex].CanPopBall())
@@ -315,6 +336,7 @@ public class GameManager : MonoBehaviour
                         ballTemp = tube.GetAllSameColorNeighBorBall();
                         tempBallType = ballTemp[0].ballData.ballType;
                     }
+                    else ResetSelection();
                 }
                 break;
 
@@ -333,7 +355,7 @@ public class GameManager : MonoBehaviour
                     break;
                 }
 
-                targetTube = runtimeListTube[tubeIndex];
+                targetTube = runtimeListTube.Where(t=>t.index == tubeIndex).Select(t=>t).First();
 
                 if(targetTube != null && targetTube.CanReceiveBall(ballTemp.Count,tempBallType))
                 {
@@ -408,82 +430,75 @@ public class GameManager : MonoBehaviour
     }
 
     private Tube GetLastTube() {
-        return runtimeListTube[TubesNumber - 1];
-    }
-
-    private List<Tube> GetSecondRowTubes()
-    {
-        List<Tube> secondRow = new List<Tube>();
-        for (int i = TubesNumber - 1; i >=TubesNumber/2 +1; i--)
-        {
-            secondRow.Add(runtimeListTube[i]);
-        }
-        return secondRow;
+        return runtimeListTube[runtimeListTube.Count - 1];
     }
 
     public void AddTube()
     {
-        if(TubesNumber > maxTubeInOneLine)
-        {
-            GetSubTubesPositionsForAdding(GetSecondRowTubes().Count + tubeForAdding); // creat sub poses 
-            int TubesNumberAfterAdd = TubesNumber + tubeForAdding;
-            Tube tube = Tube.Create(tubePrefabs[0], subTubePoses[subTubePoses.Count - 1], TubesNumberAfterAdd - 1);
-            tube.InitBallPos();
-            List<BallPos> listBallPos = tube.GetBallPosList();
-            runtimeListTube.Add(tube);
-            RepositionTubes();
-        }
-        if (TubesNumber < maxTubeInOneLine)
-        {
-            GetSubTubesPositionsForAdding(TubesNumber + tubeForAdding); // creat sub poses
-            int TubesNumberAfterAdd = TubesNumber + tubeForAdding;
-            Tube tube = Tube.Create(tubePrefabs[0], subTubePoses[subTubePoses.Count - 1], TubesNumberAfterAdd - 1);
-            tube.InitBallPos();
-            runtimeListTube.Add(tube);
-            RepositionTubes();
-        }
-        // refactor needed
-    }
-    public void GetSubTubesPositionsForAdding(int tubeNumberAfterAdd)
-    {
-        
-        float screenHalfWidth = mainCamera.aspect * mainCamera.orthographicSize;
-        float xSubSpacing = CalculateSpacing(tubeNumberAfterAdd);
-        for (int i = 0; i < tubeNumberAfterAdd; i++)
-        {
-            float xPosition = (i * xSubSpacing) - ((tubeNumberAfterAdd -1 ) * xSubSpacing / 2.0f);
-            xPosition = Mathf.Clamp(xPosition, -screenHalfWidth + tubePrefabs[0].transform.localScale.x / 2.0f + offSet, screenHalfWidth - tubePrefabs[0].transform.localScale.x / 2.0f - offSet);
-            Vector3 position = new Vector3(xPosition, GetLastTube().gameObject.transform.position.y, 0);
-            subTubePoses.Add(position);
-        }
-
-        Debug.Log(subTubePoses.Count);
-        
+        int TubesNumberAfterAdd = TubesNumber + tubeForAdding;
+        if (TubesNumberAfterAdd == runtimeListTube.Count ) return;
+        subTubePoses = SetTubePosition(TubesNumberAfterAdd);
+        Tube tube = Tube.Create(tubePrefabs[0], subTubePoses[subTubePoses.Count - 1], TubesNumberAfterAdd - 1);
+        tube.InitBallPos();
+        runtimeListTube.Add(tube);
+        RepositionTubes();
     }
 
     private void RepositionTubes()
     {
-        if(TubesNumber > maxTubeInOneLine)
+        for (int i = 0; i< runtimeListTube.Count - 1; i++)
         {
-            for (int i = 0; i < GetSecondRowTubes().Count; i++)
-            {
-                GetSecondRowTubes()[i].Reposition(subTubePoses[i]);
-            }
-        }
-        else
-        {
-            for (int i = 0; i< runtimeListTube.Count - 1; i++)
-            {
-                runtimeListTube[i].Reposition(subTubePoses[i]);
-            }
+            runtimeListTube[i].Reposition(subTubePoses[i]);
         }
     }
 
-    private bool IsCompleteLevel()
+    public bool IsCompleteLevel()
     {
-        return isCompleteLevel;
+        int count = 0;
+        foreach (var tube in runtimeListTube)
+        {
+            if (tube.tubeData.isCompleted)
+            {
+                count++;
+            }
+            
+        }
+        
+        if (count == target)
+        {
+            LevelManager.Instance.LevelState = LevelState.Complete;
+            return true;
+        }
+        else return false;
     }
 
     //check level complete and make a popup 
+    //public void NextLevel()
+    //{
+    //    currentLevel++;
+    //    levelData = LoadingManager.LoadLevel(currentLevel, levelData);
+    //    ResetLevel();
+    //    LoadLevel(currentLevel);
+    //    gameState = GameState.NONE;
+    //    levelState = LevelState.Playing;
+    //}
+
+    public void ResetLevel()
+    {
+        foreach(var tube in runtimeListTube)
+        {
+            Destroy(tube.gameObject);
+        }
+        foreach (var ball in runtimeListBall)
+        {
+            Destroy(ball.gameObject);
+        }
+        runtimeListBall.Clear();
+        runtimeListTube.Clear();
+        subTubePoses.Clear();
+        Destroy(gameObject);
+    }
+
+    
 
 }    

@@ -2,42 +2,59 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEditorInternal;
+using DataStorage;
 
-public class IColorableComponent : MonoBehaviour
+public class IColorableComponent : MonoBehaviour, IColorable
 {
-    public BallData ballData;
+    public Ball ballRef;
     public BallTypeListSO ballTypeList;
     private SpriteRenderer sr;
     public List<LevelSprite> Sprites = new List<LevelSprite>();
 
+    const string ACTIVE_BALL_LIST = "ACTIVE_BALL_LIST";
+    public int ActiveBallList
+    {
+        get => GameData.Get(ACTIVE_BALL_LIST, 0);
+        set => GameData.Set(ACTIVE_BALL_LIST, value);
+    }
+
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
+        ballRef = GetComponent<Ball>();
     }
 
-    public void SetColor() //set theo enum
+    private void OnEnable()
     {
-        BallTypeSO ball = GetBallData();
-        BallColor color = ball.color;
-        sr.sprite = ballTypeList.ballTypeList.Where(c => c.color == color)
-                                                     .Select(s => s.sprite).FirstOrDefault();
+        GetActiveBallTypeList();
     }
 
-    public void SetTypeSprite(BallTypeSO ballType)
+    public void SetSprite(BallColor color) //set theo enum
     {
-        ballData.ballType = ballType;
-        sr.sprite = ballType.sprite;
+        ballRef.ballData.color = color;
+        ballRef.ballData.SetBallType(ballTypeList.ballTypeList.Where(b => b.color == color ).FirstOrDefault());
+        SetSprite(ballRef.ballData.ballType.sprite);
+    }
+
+    private void GetActiveBallTypeList()
+    {
+        ballTypeList = GetSprites(ActiveBallList);
+    }
+
+    public void SetSprite(Sprite sprite)
+    {
+        sr.sprite = sprite;
         sr.sortingOrder = 3;
     }
 
     public BallTypeSO GetBallData()
     {
-        return ballData.ballType;
+        return ballRef.ballData.ballType;
     }
 
     public BallTypeListSO GetSprites(int currentLevel)
     {
-        if (currentLevel == 0) currentLevel = 1;
         if (Sprites.Any(i => i.level == currentLevel))
             return Sprites.First(i => i.level == currentLevel).ballTypeListPerLevel;
         return Sprites[0].ballTypeListPerLevel ;
@@ -50,6 +67,14 @@ public class IColorableComponent : MonoBehaviour
         else if (list.ballTypeList.Any()) return list.ballTypeList[0];
         return null;
     }
+
+    public Sprite GetRandomSpriteInAList(int index)
+    {
+        BallTypeListSO ballTypeList = GetSprites(index);
+        Sprite rand = ballTypeList.ballTypeList[Random.Range(0, ballTypeList.ballTypeList.Count)].sprite;
+        return rand;
+    }
+
 
     //public BallTypeListSO GetSpritesOrAdd(int level)
     //{

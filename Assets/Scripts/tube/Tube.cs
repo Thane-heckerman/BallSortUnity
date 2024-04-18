@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using UnityEngine.UI;
 
 public enum TubeState {
     NONE,
@@ -41,9 +42,9 @@ public class Tube : MonoBehaviour
         tubeData.SetBallPosList(ballPosList);
     }
 
-    public void InitBallPos()
+    public void InitBallPos(Sprite sprite)
     {
-        spacing = testingSprite.bounds.size;
+        spacing = sprite.bounds.size;
         spacing.x = 0;
         spacing.z = 0;
         for (int i = 0; i< maxBallInTube; i++)
@@ -54,6 +55,19 @@ public class Tube : MonoBehaviour
             ballPosList.Add(ballPos);
         }
         
+    }
+
+    public void InitBallPos()
+    {
+        float height = transform.GetComponent<RectTransform>().rect.height;
+        float spacing = height / 5;
+        for ( int i = 1; i< 5; i++)
+        {
+            float ySpacing = i * spacing;
+            Vector2 pos = new Vector2(0, ySpacing);
+            BallPos ballPos = BallPos.Create(this, lastBallPos, pos, this.index, i);
+            ballPosList.Add(ballPos);
+        }
     }
 
     // for receiving balls
@@ -135,7 +149,7 @@ public class Tube : MonoBehaviour
 
     public bool CanPopBall()
     {
-        return !IsCompletedTube() && HasBall();
+        return !tubeData.isCompleted && HasBall();
     }
 
     public List<Ball> GetAllSameColorNeighBorBall()
@@ -151,6 +165,7 @@ public class Tube : MonoBehaviour
             {
                 allSameColorBallWithLastBall.Add(ball);
             }
+            else break;
         }
         return allSameColorBallWithLastBall;
     }
@@ -232,21 +247,24 @@ public class Tube : MonoBehaviour
         this.tubeGO = gameObject;
     }
 
-    public bool IsCompletedTube()
+    public void CheckIsCompletedTube()
     {
-        if (GetAllBallInTubeCount() != maxBallInTube) return false;
+        if (GetAllBallInTubeCount() != maxBallInTube) return;
         BallTypeSO ballType = GetLastBall().ballData.ballType;
         var ballList = ballPosList.Select(b => b.ballPosData.ball).Where(b=>b.ballData.ballType == ballType).ToList();
-        if (ballList.Count == 4) return true;
-        return false;
+        if (ballList.Count == 4)
+        {
+            tubeData.isCompleted = true;
+        }
     }
 
     public void Reposition(Vector2 pos ) {
         transform.position = pos;
         foreach(var ballPos in ballPosList)
         {
-            ballPos.Reposition(new Vector2(pos.x, ballPos.ballPosData.position.y));
-            if (ballPos.IsContainBall()) {
+            ballPos.ballPosData.position = ballPos.transform.position;
+            if (ballPos.IsContainBall())
+            {
                 ballPos.ballPosData.ball.transform.position = ballPos.transform.position;
             }
         }

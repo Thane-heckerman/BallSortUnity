@@ -25,7 +25,7 @@ public class BallMovement : MonoBehaviour
 
     private void UpdateBallState()
     {
-        if(Vector2.Distance(transform.position, targetPos) < 0.01f)
+        if(Vector2.Distance(transform.position, targetPos) < 0.001f)
         {
             ballState = BallState.NONE;
         }
@@ -35,15 +35,22 @@ public class BallMovement : MonoBehaviour
     {
         ballState = BallState.MOVING;
         Sequence sequence = DOTween.Sequence();
-        Tween moveToUpPos = transform.DOMove(pos1,.2f);
+        Tween moveToUpPos = transform.DOMove(pos1,.2f).OnComplete(()=> transform.position = pos1);
+        
         sequence.Append(moveToUpPos);
         yield return new WaitForSeconds(.2f);
         if (pos2 != null)
         {
-            Tween moveToBallPos = transform.DOMove((Vector3)pos2, .2f).SetEase(Ease.InOutBounce).Play();
+            Tween moveToBallPos = transform.DOMove((Vector3)pos2, .2f).SetEase(Ease.InOutBounce).Play().
+                OnComplete(()=> transform.position = (Vector3)pos2);
         }
         yield return new WaitForEndOfFrame();
     }
+
+    //public IEnumerator MoveToTargetParam(params Vector3[] poses)
+    //{
+        
+    //}
 
     public bool IsMovedToTarget(Vector3 pos)
     {

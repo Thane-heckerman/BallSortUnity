@@ -39,11 +39,6 @@ public class Ball : MonoBehaviour
         return ball;
     }
 
-    private void Update()
-    {
-       
-    }
-
     public void Destroy()
     {
         Destroy(gameObject);
