@@ -31,8 +31,9 @@ public class IColorableComponent : MonoBehaviour, IColorable
     {
         ballTypeList = GetSprites(index);
         Debug.Log(ballTypeList.name);
-        Sprite sprite = ballTypeList.ballTypeList.Where(b => b.color == color).FirstOrDefault().sprite;
-        Debug.Log(sprite.name);
+        BallTypeSO balltype = ballTypeList.ballTypeList.Where(b => b.color == color).FirstOrDefault();
+        GetComponent<Ball>().ballData.ballType = balltype;
+        Sprite sprite = balltype.sprite;
         SetSprite(sprite);
     }
 

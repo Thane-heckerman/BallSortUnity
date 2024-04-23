@@ -60,8 +60,13 @@ public class ShopUIPreview : MonoBehaviour
 
     public void Clear()
     {
-        ballPoses.Clear();
+        if(ballPoses != null)
+        {
+            ballPoses.Clear();
+        }
+        if(balls.Count != 0) {
         balls.Clear();
+        }
         tubePreviewTransform = null;
         if(tubePrefab != null)
         {
