@@ -21,10 +21,13 @@ public class Gift : MonoBehaviour
 
     private void OnClickAnim()
     {
-        if (pileOfCoins.GetComponent<MovingCoin>().isBusy) return;
-        transform.DOScale(new Vector2(1.2f, 1.2f), .5f);
-        pileOfCoins.gameObject.SetActive(true);
-        gameObject.SetActive(false);
+        Debug.Log("gift clicked");
+        if (!GiftManager.Instance.canReceiveMoreGift) return;
+        transform.DOScale(new Vector2(1.2f, 1.2f), .5f).OnComplete(() =>
+        {
+            gameObject.SetActive(false);
+            CoinPile.Instance.SpawnCoin();
+        });
         OnGiftClicked?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -2,97 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-
+using System;
 public class MovingCoin : MonoBehaviour
 {
+    //public static event EventHandler<OnCoinMovedToTargetEventArgs> OnCoinMovedToTarget;
+
+    //public class OnCoinMovedToTargetEventArgs
+    //{
+    //    public int amount;
+    //}
+
     public bool isBusy;
 
-    public static MovingCoin Instance;
+    private Transform coinMovingTarget;
 
-    [SerializeField] private Transform coinMovingTarget;
-
-    private void Awake()
+    public void SetTarget(Transform target)
     {
-        Instance = this;
-        gameObject.SetActive(false);
+        this.coinMovingTarget = target;
     }
 
-    private void OnEnable()
+    public IEnumerator MoveToTarget(Transform target, float delay)
     {
-        Gift.OnGiftClicked += Gift_OnGiftClicked;
-    }
+        AppearOnPosition(target.position);
 
-    private void OnDisable()
-    {
-        Gift.OnGiftClicked -= Gift_OnGiftClicked;
-    }
+        SetTarget(target);
 
-    private void Gift_OnGiftClicked(object sender, System.EventArgs e)
-    {
-        AppearOnPosition();
-        movingToTarget();
-    }
+        isBusy = true;
 
-    public void AppearOnPosition()
-    {
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            Transform coinChild = transform.GetChild(i);
-            coinChild.DOScale(1, .2f);
-            coinChild.transform.DOMove(new Vector3(transform.position.x + Random.Range(-150,150), transform.position.y + Random.Range(-150, 150)),.1f);
+        gameObject.SetActive(true);
 
-        }
-    }
+        transform.DOScale(1f, 0.3f).SetDelay(delay).SetEase(Ease.OutBack);
 
-    private void movingToTarget()
-    {
-        Reset();
-        float delay = 0;
-        for (int i = 0; i< transform.childCount; i++)
-        {
+        transform.DOMove(target.position, 0.5f).SetDelay(delay + 0.5f)
+            .SetEase(Ease.OutBack);
 
-            Transform coinChild = transform.GetChild(i);
+        transform.DOScale(0f, 0.3f).SetDelay(delay + 1.5f).OnComplete(() => GetComponent<coin>().Collect());
 
-            coin coin = coinChild.GetComponent<coin>();
+        isBusy = false;
 
-            coin.IsMovingToTarget(coinMovingTarget,delay);
-
-            delay += 0.2f;
-        }
-
-    }
-
-    private void FixedUpdate()
-    {
-        isBusy = !IsAllCoinMovedToTarget();
-    }
-
-    public bool IsAllCoinMovedToTarget()
-    {
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            Transform coinChild = transform.GetChild(i);
-            if (coinChild.GetComponent<coin>().isBusy)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public IEnumerator CoinMovingAnimation()
-    {
         yield return new WaitForEndOfFrame();
-        movingToTarget();
-        
     }
 
-    private void Reset()
+    public void AppearOnPosition(Vector2 position)
     {
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            Transform coinChild = transform.GetChild(i);
-            coinChild.transform.position = this.transform.position;
-        }
+        transform.position = new Vector3(position.x + UnityEngine.Random.Range(-150f, 50f), position.y - 50f, 0f);
     }
+
 }

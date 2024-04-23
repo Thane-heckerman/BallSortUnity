@@ -105,7 +105,7 @@ MonoBehaviour:
     ballType: {fileID: 0}
     index: 0
     position: {fileID: 0}
-    ball: {fileID: 0}
+    ball: {fileID: 9154199289199708086}
 --- !u!114 &5224301881749307959
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,14 +4,10 @@ using UnityEngine;
 
 public class TubeSpawner : BaseSpawner
 {
+    public Vector2 pos;
     protected override void Awake()
     {
         base.Awake();
-
     }
 
-    protected override void LoadPrefab()
-    {
-        base.LoadPrefab();
-    }
 }

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4772bb6ee85a4480cb4f447123303ad2, type: 3}
   m_Name: Orange
   m_EditorClassIdentifier: 
-  color: 0
+  color: 5
   nameString: Orange Ball
   sprite: {fileID: 21300000, guid: 0ee1ee9a2a154483084655e08f2a6610, type: 3}

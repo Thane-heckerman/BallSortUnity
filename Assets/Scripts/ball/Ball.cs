@@ -27,10 +27,6 @@ public class Ball : MonoBehaviour
     private BallState ballState;
     public Ball bottomNeighbor;
     public BallData ballData = new BallData();
-    private BallPos ballPos;
-    private IColorableComponent colorableComponent;
-    private bool canGoOut;
-
     public static Ball Create(Transform ballPos)
     {
         Transform ballPrefab = Resources.Load<Transform>("BallPrefab");

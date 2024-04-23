@@ -2,12 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ISpawn
-{
-    public Transform Spawn(string prefabName, Vector3 spawnPos, Quaternion rotation);
-}
 
-public abstract class BaseSpawner : MonoBehaviour, ISpawn
+public abstract class BaseSpawner : MonoBehaviour
 {
     public List<Transform> prefabs;
 
@@ -73,4 +69,40 @@ public abstract class BaseSpawner : MonoBehaviour, ISpawn
         return newPrefab;
     }
 
+}
+
+public abstract class BaseSpawner<T> : MonoBehaviour 
+{
+    public int numberToSpawn;
+
+    public List<Transform> prefabs;
+
+    public int spawnedCount = 0;
+
+
+    public Transform Spawn(Transform prefab, Vector3 spawnPos, Quaternion rotation)
+    {
+        Transform obj = Instantiate(prefab, spawnPos, rotation);
+        return obj;
+    }
+
+    public T Spawn()
+    {
+        Transform obj = Instantiate(prefabs[0]);
+        T typeObj = obj.GetComponent<T>();
+        return typeObj;
+    }
+
+    public virtual List<T> SpawnABunch()
+    {
+        List<T> list = new List<T>();
+
+        for ( int i = 0; i < numberToSpawn; i++)
+        {
+            Transform obj = Instantiate(prefabs[0]);
+            list.Add(obj.GetComponent<T>());
+        }
+
+        return list;
+    }
 }

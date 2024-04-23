@@ -269,4 +269,18 @@ public class Tube : MonoBehaviour
             }
         }
     }
+
+    public List<Ball> GetBalls()
+    {
+        var balls = new List<Ball>();
+        foreach ( var ballPos in GetBallPosList())
+        {
+            if (ballPos.IsContainBall())
+            {
+                balls.Add(ballPos.GetBallComponent());
+            }
+            else return balls;
+        }
+        return balls;
+    }
 }

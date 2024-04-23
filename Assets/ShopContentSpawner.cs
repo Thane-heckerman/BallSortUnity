@@ -11,12 +11,10 @@ public class ShopContentSpawner : BaseSpawner
         base.Awake();
         IColorableComponent colorableComponent = prefabs[0].GetComponent<IColorableComponent>();
         ballListCount = colorableComponent.Sprites.Count;
-        Debug.Log(ballListCount); //6
     }
 
     private void OnEnable()
     {
-        SpawnContent();
     }
 
     protected override void LoadPrefab()
@@ -24,16 +22,19 @@ public class ShopContentSpawner : BaseSpawner
         base.LoadPrefab();
         //prefabs.Add(Resources.Load<Transform>("BallPrefabPreview"));
     }
-    public void SpawnContent()
+    public List<ShopItem> SpawnContent()
     {
+        List<ShopItem> shopItems = new List<ShopItem>();
         for (int i = 0; i < ballListCount ; i++)
         {
             Transform pf = Spawn();
-            UIShopBtn uiShopBtn = pf.GetComponent<UIShopBtn>();
-            uiShopBtn.Index = i;
-            uiShopBtn.SetSprite();
+            ShopItem shopItem = pf.GetComponent<ShopItem>();
+            shopItem.Index = i;
+            shopItem.SetSprite();
+            shopItem.UpdateStatus();
+            shopItems.Add(shopItem);
         }
-
+        return shopItems;
     }
 
     public override Transform Spawn()
@@ -42,10 +43,6 @@ public class ShopContentSpawner : BaseSpawner
         pf.SetParent(this.transform);
         return pf;
     }
-    //private void SetSprite()
-    //{
-    //    foreach
-    //}
 
     public override Transform Spawn(Transform prefab)
     {

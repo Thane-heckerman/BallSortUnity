@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6414617010605958439}
   - component: {fileID: 4309268456658241118}
   - component: {fileID: 287764563746993309}
-  - component: {fileID: 5641203096599830578}
+  - component: {fileID: 7236506721457213868}
   m_Layer: 0
   m_Name: BallPrefabPreview
   m_TagString: ball
@@ -73,17 +73,17 @@ MonoBehaviour:
   ballRef: {fileID: 6414617010605958439}
   ballTypeList: {fileID: 0}
   Sprites:
-  - level: 1
+  - level: 0
     ballTypeListPerLevel: {fileID: 11400000, guid: f419381d2bcdc48aeb36d18324944e07, type: 2}
-  - level: 2
+  - level: 1
     ballTypeListPerLevel: {fileID: 11400000, guid: 8d96425afc3d840beb32f611bceca879, type: 2}
-  - level: 3
+  - level: 2
     ballTypeListPerLevel: {fileID: 11400000, guid: 3202ec33e621f4a96bf637fa70703268, type: 2}
-  - level: 4
+  - level: 3
     ballTypeListPerLevel: {fileID: 11400000, guid: 4cca1c1e6d2ef407685cff8e636a7c52, type: 2}
-  - level: 5
+  - level: 4
     ballTypeListPerLevel: {fileID: 11400000, guid: 17a38cc56818d48129aa08c15033851a, type: 2}
-  - level: 6
+  - level: 5
     ballTypeListPerLevel: {fileID: 11400000, guid: 3806f9a547bb54ca394c10435044b0a1, type: 2}
 --- !u!222 &287764563746993309
 CanvasRenderer:
@@ -93,7 +93,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4694345566360383889}
   m_CullTransparentMesh: 1
---- !u!114 &5641203096599830578
+--- !u!114 &7236506721457213868
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

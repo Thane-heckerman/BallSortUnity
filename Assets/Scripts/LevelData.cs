@@ -61,8 +61,9 @@ public class GameFieldData
 public class TubesForEditor
 {
     public int maxBallPosNumber;
-    public GameObject TubePrefab;
+
     public List<BallPosLayer> listBallPost;
+
     public TubesForEditor DeepCopy()
     {
         var other = (TubesForEditor)MemberwiseClone();
@@ -73,14 +74,26 @@ public class TubesForEditor
     {
         return listBallPost[ballPost].GetItem();
     }
+
+    public void Initialize()
+    {
+        for (int i = 0; i < maxBallPosNumber; i++)
+        {
+            listBallPost.Add(new BallPosLayer(i));
+        }
+    }
 }
 
 [System.Serializable]
 public class BallPosLayer
 {
-    public GameObject BallPosGameObject;
-
+    public int index;
     public ItemForEditor itemForEditor;
+
+    public BallPosLayer(int index)
+    {
+        this.index = index;
+    }
 
     public ItemForEditor GetItem()
     {
@@ -100,10 +113,10 @@ public class BallPosLayer
 
 [System.Serializable]
 public class ItemForEditor {
-    public BallTypeSO ballType;
-    public Texture2D texture2D;
-    public IColorableComponent colors;
-    public GameObject ball;
+    //public BallTypeSO ballType;
+    //public Texture2D texture2D;
+    //public IColorableComponent colors;
+    //public GameObject ball;
     public BallColor color;
 
     public ItemForEditor DeepCopy()

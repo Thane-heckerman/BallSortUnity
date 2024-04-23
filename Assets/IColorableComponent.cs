@@ -4,15 +4,18 @@ using UnityEngine;
 using System.Linq;
 using UnityEditorInternal;
 using DataStorage;
+using UnityEngine.UI;
 
 public class IColorableComponent : MonoBehaviour, IColorable
 {
     public Ball ballRef;
     public BallTypeListSO ballTypeList;
     private SpriteRenderer sr;
+    private Image image;
     public List<LevelSprite> Sprites = new List<LevelSprite>();
 
     const string ACTIVE_BALL_LIST = "ACTIVE_BALL_LIST";
+
     public int ActiveBallList
     {
         get => GameData.Get(ACTIVE_BALL_LIST, 0);
@@ -21,31 +24,49 @@ public class IColorableComponent : MonoBehaviour, IColorable
 
     private void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
         ballRef = GetComponent<Ball>();
     }
 
-    private void OnEnable()
+    public void SetSprite(BallColor color, int index) //set theo enum
     {
-        GetActiveBallTypeList();
+        ballTypeList = GetSprites(index);
+        Debug.Log(ballTypeList.name);
+        Sprite sprite = ballTypeList.ballTypeList.Where(b => b.color == color).FirstOrDefault().sprite;
+        Debug.Log(sprite.name);
+        SetSprite(sprite);
     }
 
-    public void SetSprite(BallColor color) //set theo enum
-    {
+    private void SetBallRefType(BallTypeSO ballType) {
+
+        ballRef.ballData.ballType = ballType;
+
+    }
+
+    private void SetBallColor(BallColor color) {
         ballRef.ballData.color = color;
-        ballRef.ballData.SetBallType(ballTypeList.ballTypeList.Where(b => b.color == color ).FirstOrDefault());
-        SetSprite(ballRef.ballData.ballType.sprite);
     }
 
-    private void GetActiveBallTypeList()
+    public void GetActiveBallTypeList()
     {
         ballTypeList = GetSprites(ActiveBallList);
     }
 
-    public void SetSprite(Sprite sprite)
+    public void SetSprite(Sprite sprite)// interface 
     {
-        sr.sprite = sprite;
-        sr.sortingOrder = 3;
+        if (GetComponent<SpriteRenderer>() != null)
+        {
+            sr = GetComponent<SpriteRenderer>();
+            Debug.Log("has SpriteRenderer");
+            sr.sprite = sprite;
+            sr.sortingOrder = 3;
+        }
+        else
+        {
+            var image = GetComponent<Image>();
+            image.sprite = sprite;
+            Debug.Log("spirte name after changing" + image.sprite.name);
+        }
+
     }
 
     public BallTypeSO GetBallData()
@@ -75,7 +96,7 @@ public class IColorableComponent : MonoBehaviour, IColorable
         return rand;
     }
 
-
+    
     //public BallTypeListSO GetSpritesOrAdd(int level)
     //{
     //    if(Sprites.All(i => i.level != level))

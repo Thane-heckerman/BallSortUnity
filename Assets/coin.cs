@@ -2,51 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using DataStorage;
 
-public class coin : MonoBehaviour
+public class coin : Item, IColectable
 {
+    private int Amount;
+
     public bool isBusy;
 
     private Transform target;
 
-    private void Update()
+    protected override void Awake()
     {
-        CheckBusy();
+        //gameObject.SetActive(false);
     }
 
-    public bool IsMovingToTarget(Transform target, float delay)
+    private void OnEnable()
     {
-        SetTarget(target);
-
-        isBusy = true;
-
-        gameObject.SetActive(true);
-
-        transform.DOScale(1f, 0.3f).SetDelay(delay).SetEase(Ease.OutBack);
-
-        transform.DOMove(target.position, 0.5f).SetDelay(delay + 0.5f)
-            .SetEase(Ease.OutBack);
-
-        transform.DOScale(0f, 0.3f).SetDelay(delay + 1.5f);
-
-        return isBusy;
+        Amount = Random.Range(10, 50);
     }
 
-    public void SetTarget(Transform target)
+    public void Collect()
     {
-        this.target = target;
+        CoinPile.Instance.AddCoin(Amount);
     }
-
-    private bool CheckBusy()
-    {
-        if (Vector2.Distance(transform.position, target.position) < 0.1f)
-        {
-
-            isBusy = false;
-        }
-        else isBusy = true;
-        return isBusy;
-    }
-
-    
 }

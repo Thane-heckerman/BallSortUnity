@@ -1,12 +1,10 @@
- using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using System.Linq;
-using UnityEngine.UIElements;
-
+using DataStorage;
 public enum GameState {
     NONE,
     OnPopBall,
@@ -44,6 +42,7 @@ public class GameManager : MonoBehaviour
     private float xSpacing ;
     private float offSet = .5f;
     private int target;
+
     
     //public LevelManager levelManager;
 
@@ -93,9 +92,10 @@ public class GameManager : MonoBehaviour
         gameState = GameState.NONE;
     }
 
-    public void InitGameField() //tight coupling 
+    public void InitGameField()  
     {
         gameFieldData = levelData.fields[0];
+        TubesNumber = gameFieldData.tubes.Count;
         SetWinCondition();
         SetTubePosition(TubesNumber);
         InitTube();
@@ -109,19 +109,20 @@ public class GameManager : MonoBehaviour
         {
             List<TubesForEditor> tubesForEditors = gameFieldData.tubes;
             List<BallPos> listBallPos = runtimeListTube[i].GetBallPosList();
-            for (int j = 0; j < listBallPos.Count; j++)
+            for (int j = 0; j < tubesForEditors[i].maxBallPosNumber; j++)
             {
                 if (tubesForEditors[i].listBallPost[j].itemForEditor.color != BallColor.NONE)
                 {
                     Ball ball = Ball.Create(listBallPos[j].transform);
                     IColorableComponent colorableComponent = ball.GetComponent<IColorableComponent>();
-                    colorableComponent.SetSprite(tubesForEditors[i].listBallPost[j].itemForEditor.color);
+                    colorableComponent.SetSprite(tubesForEditors[i].listBallPost[j].itemForEditor.color, colorableComponent.ActiveBallList);
                     ball.SetIndex(j);
                     ball.transform.SetParent(this.transform);
                     listBallPos[j].ballPosData.SetBallObj(ball);
                     listBallPos[j].ballPosData.SetData(runtimeListTube[i].GetTubeIndex(), j, listBallPos[j].transform.position);
                     runtimeListBall.Add(ball);
                 }
+                else break;
             }
         }
     }

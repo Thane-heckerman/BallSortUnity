@@ -20,8 +20,8 @@ public class LevelMakerEditor : EditorWindow
         var ball = Resources.Load<GameObject>("BallPrefab").GetComponent<Ball>();
         var balls = ball.GetComponent<IColorableComponent>().GetSprites(currentLevel).ballTypeList.Select(i => new ItemForEditor
         {
-            ball = ball.gameObject,
-            ballType = ball.ballData.ballType,
+            //ball = ball.gameObject,
+            //ballType = ball.ballData.ballType,
             color = i.color,
 
         }).ToList();
