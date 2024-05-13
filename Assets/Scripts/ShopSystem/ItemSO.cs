@@ -11,8 +11,9 @@ public class ItemSO : ScriptableObject
     public string itemName;
     public string itemKey;
 
-    public void SetItemKey(string id) {
-        itemKey = string.Format($"{itemType}_{itemName}_{id}");
+    public virtual void SetItemKey()
+    {
+        itemKey = string.Format($"{itemType}_{itemKey}");
     }
 
 }

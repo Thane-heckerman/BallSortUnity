@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3245421114586101059}
   - component: {fileID: 6964693794104187999}
   - component: {fileID: 1436530338068149608}
-  - component: {fileID: 7017968871979007382}
   - component: {fileID: 8406997850396780296}
   - component: {fileID: 4670743516774460878}
   - component: {fileID: 1549063485393486157}
@@ -95,18 +94,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7017968871979007382
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3569971495281335066}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12f8b76c0849a412a85778e3e5b3ab98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8406997850396780296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,12 +163,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04d7f0b762c9345f781893a59ebcde69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: e329f81338c7c4fbe80d13353b53c37f, type: 2}
-  ownedStatus: 0
+  item: {fileID: 11400000, guid: cb4fc9e0da87c4563ab09b413cd34bb5, type: 2}
   itemQuantity: 0
   sprite: {fileID: 0}
-  ownedGameObject: {fileID: 5412188440638091480}
   index: 0
+  shopItemSO: {fileID: 11400000, guid: cb4fc9e0da87c4563ab09b413cd34bb5, type: 2}
+  costAmount: 0
+  ownedGameObject: {fileID: 5412188440638091480}
 --- !u!1 &5412188440638091480
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,7 +310,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: de40ab28085ef42b7a797e4ee0032b4a, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

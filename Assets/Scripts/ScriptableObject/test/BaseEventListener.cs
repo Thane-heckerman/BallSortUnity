@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEngine.GraphicsBuffer;
 
 public class BaseEventListener<TEvent,TResponse> : MonoBehaviour , IEventListener
     where TEvent : BaseEvent
@@ -35,7 +37,7 @@ public class BaseEventListener<TType,TEvent,TResponse> : MonoBehaviour,IEventLis
 
     public void OnEventRaised(TType data)
     {
-        response.Invoke(data);
+        response?.Invoke(data);
     }
     public void OnEnable()
     {
@@ -47,3 +49,4 @@ public class BaseEventListener<TType,TEvent,TResponse> : MonoBehaviour,IEventLis
         Event.RemoveListener(this);
     }
 }
+

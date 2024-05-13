@@ -14,195 +14,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelData:
     intLevelNum: 2
-    timeLimit: 0
+    timeLimit: 360
     goalType: {fileID: 0}
     fields:
-    - maxTubeNumber: 0
+    - maxTubeNumber: 4
       maxBallNumer: 3
       tubes:
-      - maxBallPosNumber: 0
-        TubePrefab: {fileID: 0}
+      - maxBallPosNumber: 4
         listBallPost:
-        - BallPosGameObject: {fileID: 0}
+        - index: 0
           itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
+            color: 1
+        - index: 0
+          itemForEditor:
+            color: 1
+        - index: 0
+          itemForEditor:
+            color: 3
+        - index: 0
+          itemForEditor:
+            color: 3
+      - maxBallPosNumber: 4
+        listBallPost:
+        - index: 0
+          itemForEditor:
+            color: 1
+        - index: 0
+          itemForEditor:
+            color: 1
+        - index: 0
+          itemForEditor:
+            color: 3
+        - index: 0
+          itemForEditor:
+            color: 3
+      - maxBallPosNumber: 4
+        listBallPost:
+        - index: 0
+          itemForEditor:
             color: 4
-        - BallPosGameObject: {fileID: 0}
+        - index: 0
           itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
             color: 4
-        - BallPosGameObject: {fileID: 0}
+      - maxBallPosNumber: 4
+        listBallPost:
+        - index: 0
           itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
             color: 4
-        - BallPosGameObject: {fileID: 0}
+        - index: 0
           itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
             color: 4
-      - maxBallPosNumber: 0
-        TubePrefab: {fileID: 0}
-        listBallPost:
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 4
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-      - maxBallPosNumber: 0
-        TubePrefab: {fileID: 0}
-        listBallPost:
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-      - maxBallPosNumber: 0
-        TubePrefab: {fileID: 0}
-        listBallPost:
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-      - maxBallPosNumber: 0
-        TubePrefab: {fileID: 0}
-        listBallPost:
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1
-      - maxBallPosNumber: 0
-        TubePrefab: {fileID: 0}
-        listBallPost:
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 2
-        - BallPosGameObject: {fileID: 0}
-          itemForEditor:
-            ballType: {fileID: 0}
-            texture2D: {fileID: 0}
-            colors: {fileID: 0}
-            ball: {fileID: 0}
-            color: 1

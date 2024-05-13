@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 1519631554898516997}
   - component: {fileID: 4836467626997812355}
   m_Layer: 5
-  m_Name: NotPass
+  m_Name: Lock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -280,12 +280,12 @@ GameObject:
   - component: {fileID: 2325117585710074722}
   - component: {fileID: 3877575442161066668}
   m_Layer: 5
-  m_Name: Unlocked
+  m_Name: BG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2275712046413113065
 RectTransform:
   m_ObjectHideFlags: 0
@@ -465,9 +465,9 @@ MonoBehaviour:
   IsLocked: 0
   StarsCount: 0
   StarsHoster: {fileID: 0}
-  Star1: {fileID: 0}
-  Star2: {fileID: 0}
-  Star3: {fileID: 0}
+  Star1: {fileID: 4514553161820858326}
+  Star2: {fileID: 6336603688682958933}
+  Star3: {fileID: 2368328655293474292}
 --- !u!1 &4512422921012936475
 GameObject:
   m_ObjectHideFlags: 0

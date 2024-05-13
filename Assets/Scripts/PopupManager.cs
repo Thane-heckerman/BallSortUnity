@@ -4,15 +4,31 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using DG.Tweening;
+using TMPro;
+using static System.Net.Mime.MediaTypeNames;
+
+public enum GameScenePopup
+{
+    popupWin,
+    popupReward,
+    levelSelectorPanel,
+    ShopUI,
+    GameUI,
+}
 public class PopupManager : MonoBehaviour
 {
+
     public static PopupManager Instance { get; private set; }
     [SerializeField] private GameObject popupWin;
     [SerializeField] private GameObject popupReward;
     [SerializeField] private GameObject levelSelectorPanel;
     [SerializeField] private GameObject ShopUI;
-
+    [SerializeField] private GameObject GameUI;
+    private int totalStars;
+    public List<GameObject> popupList;
+    public GameScenePopup popup;
     public static event EventHandler OnPopupAppered;
+    public GameObject currentActivePopup;
     // Start is called before the first frame update
 
 
@@ -20,45 +36,128 @@ public class PopupManager : MonoBehaviour
     {
         Instance = this;
         //DontDestroyOnLoad(this.gameObject);
+
+        popupList = new List<GameObject>() { popupReward, popupWin, levelSelectorPanel, ShopUI, GameUI };
+        LevelManager.OnCompleteLevel += LevelManager_OnCompleteLevel;
+        LevelManager.OnStartGame += LevelManager_OnStartGame;
+        SceneLoader.OnLoadGameScene += SceneLoader_OnLoadGameScene;
     }
 
     void OnEnable()
     {
-        LevelManager.OnCompleteLevel += LevelManager_OnCompleteLevel;
+        foreach (var popup in popupList)
+        {
+            popup.gameObject.SetActive(false);
+        }
     }
-   
-    private void OnDisable()
+
+    private void SceneLoader_OnLoadGameScene(object sender, EventArgs e)
+    {
+        TogglePopup(currentActivePopup, false);
+    }
+
+    private void LevelManager_OnStartGame()
+    {
+
+    }
+
+    private void OnDestroy()
     {
         LevelManager.OnCompleteLevel -= LevelManager_OnCompleteLevel;
+        LevelManager.OnStartGame -= LevelManager_OnStartGame;
+        SceneLoader.OnLoadGameScene -= SceneLoader_OnLoadGameScene;
     }
 
     private void LevelManager_OnCompleteLevel()
     {
-        StartCoroutine(PopupAppearAnim(1f, popupWin));
-    }
-
-    public void ToggleGameUI(bool enable)
-    {
-        Transform GameBG = transform.Find("Game");
-        GameBG.gameObject.SetActive(enable);
-    }
-
-    IEnumerator PopupAppearAnim(float time, GameObject popup)
-    {
-        yield return new WaitForSeconds(time);
-        Animator animator = popup.GetComponent<Animator>();
-        popup.SetActive(true);
-        animator.Play("PopupAppear");
+        TogglePanel(GameScenePopup.popupWin, true);
         OnPopupAppered?.Invoke(this, EventArgs.Empty);
-
     }
 
-    public void ToggleUILevelSelector(bool enable) {
+    public void ToggleUILevelSelector(bool enable)
+    {
+        currentActivePopup.SetActive(!enable);
         levelSelectorPanel.SetActive(enable);
     }
 
-    public void ToggleShopUI(bool enable)
+    private void TogglePopup(GameObject popup, bool enable)
     {
-        ShopUI.SetActive(enable);
+        switch (enable)
+        {
+            case true:
+                if (currentActivePopup != null) TogglePopup(currentActivePopup, false);
+                popup.SetActive(true);
+                currentActivePopup = popup;
+                break;
+            case false:
+                popup.SetActive(false);
+                break;
+        }
+
     }
+
+    public void TogglePanel(GameScenePopup popup, bool enable)
+    {
+        switch (popup)
+        {
+            case GameScenePopup.popupWin:
+                TogglePopup(popupWin, enable);
+                break;
+            case GameScenePopup.popupReward:
+                Debug.Log("popup reward = " + enable);
+                TogglePopup(popupReward, enable);
+                break;
+            case GameScenePopup.levelSelectorPanel:
+                TogglePopup(levelSelectorPanel, enable);
+                LevelMapManager.Instance.ToggleLevels(enable);
+                Debug.Log("level toggle " + enable);
+                break;
+            case GameScenePopup.ShopUI:
+                TogglePopup(ShopUI, enable);
+                break;
+            case GameScenePopup.GameUI:
+                TogglePopup(GameUI, enable);
+                break;
+        }
+    }
+
+    private bool CanOpenGiftPanel()
+    {
+        Debug.Log("checker openGiftPanel");
+        if (totalStars == 0)
+        {
+            totalStars = CheckTotalStarCount();
+            return false;
+        }
+        if (CheckTotalStarCount() != totalStars && CheckTotalStarCount() % 6 == 0)
+        {
+            return true;
+        }
+        else return false;
+    }
+
+    private int CheckTotalStarCount()
+    {
+        var starsCount = 0;
+        for (var i = 0; i <= LevelMapManager.Instance.LevelCount; i++)
+        {
+            if (MapProgressManager.GetLevelStarCount(i + 1) != 0)
+            {
+                totalStars += MapProgressManager.GetLevelStarCount(i + 1);
+            }
+            else break;
+        }
+        return starsCount;
+    }
+
+    //private void ResetCurrentActivePopup()
+    //{
+    //    currentActivePopup.SetActive(false);
+    //    currentActivePopup = null;
+    //}
+
+    //private void SetCurrentActivePopup(GameObject popup)
+    //{
+    //    currentActivePopup = popup;
+    //}
 }

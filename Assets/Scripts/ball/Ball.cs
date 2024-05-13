@@ -24,6 +24,7 @@ public enum BallState {
 
 public class Ball : MonoBehaviour
 {
+    
     private BallState ballState;
     public Ball bottomNeighbor;
     public BallData ballData = new BallData();

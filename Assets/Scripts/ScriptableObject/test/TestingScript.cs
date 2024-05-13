@@ -4,19 +4,22 @@ using UnityEngine;
 
 public class TestingScript : MonoBehaviour
 {
-
-    public LevelSO testLevel;
-
-    private void Awake()
-    {
-        
-    }
+    public Transform tubePre;
+    List<Vector2> poses;
+    public GameManager gameManager;
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.Z))
         {
-            testLevel.MaxTubeNumber += 1;
+            poses = gameManager.SetTubePositionForRefactoring(7);
+            foreach (var pos in poses)
+            {
+                Tube.Create(tubePre, pos, 0);
+            }
+
         }
+
     }
+
 }

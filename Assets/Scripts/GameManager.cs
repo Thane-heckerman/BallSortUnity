@@ -13,7 +13,6 @@ public enum GameState {
     OnFallingBallCompleted,
     OnGetBallBack,
     OnGetBallBackCompleted,
-    OnWin
 }
 
 
@@ -25,7 +24,7 @@ public class GameManager : MonoBehaviour
     public GameState gameState { get; set; }
     public static GameManager Instance { get; private set; }
     private Camera mainCamera;
-    private List<Transform> tubePrefabs = new List<Transform>();
+    [SerializeField] private List<Transform> tubePrefabs = new List<Transform>();
     private GameFieldData gameFieldData;
     public Tube selectedTube ;
     public Tube targetTube ;
@@ -51,9 +50,7 @@ public class GameManager : MonoBehaviour
         //DontDestroyOnLoad(this.gameObject);
         mainCamera = Camera.main;
         Instance = this;
-        Transform tubePrefab = Resources.Load<Transform>("TubesPrefab");
-        tubePrefabs.Add(tubePrefab);
-
+        
     }
 
     public void SetGameState(GameState gameState)
@@ -66,16 +63,6 @@ public class GameManager : MonoBehaviour
         target = gameFieldData.maxBallNumer;
     }
 
-    //public void LoadLevel(int level)
-    //{
-    //    OnLoadLevel?.Invoke(this, EventArgs.Empty);
-    //    mainCamera = Camera.main;
-    //    currentLevel = levelData.intLevelNum;
-    //    TubesNumber = levelData.fields[0].tubes.Count;
-    //    gameFieldData = levelData.fields[0];
-    //    InitGameField();
-    //    SetWinCondition();
-    //}
 
     private void OnEnable()
     {
@@ -94,6 +81,8 @@ public class GameManager : MonoBehaviour
 
     public void InitGameField()  
     {
+        tubePrefabs.Add(Resources.Load<Transform>("TubesPrefab"));
+
         gameFieldData = levelData.fields[0];
         TubesNumber = gameFieldData.tubes.Count;
         SetWinCondition();
@@ -103,13 +92,13 @@ public class GameManager : MonoBehaviour
     }
 
     
-    private void InitBall()
+    private void InitBall() // let ball spawner do the thing
     {
         for (int i = 0; i < runtimeListTube.Count; i++)
         {
             List<TubesForEditor> tubesForEditors = gameFieldData.tubes;
             List<BallPos> listBallPos = runtimeListTube[i].GetBallPosList();
-            for (int j = 0; j < tubesForEditors[i].maxBallPosNumber; j++)
+            for (int j = 0; j < tubesForEditors[i].listBallPost.Count; j++)
             {
                 if (tubesForEditors[i].listBallPost[j].itemForEditor.color != BallColor.NONE)
                 {
@@ -129,7 +118,6 @@ public class GameManager : MonoBehaviour
 
     private void InitTube()
     {
-        
         List<Vector2> positions = SetTubePosition(TubesNumber);
         for (int i = 0; i < positions.Count; i++)
         {
@@ -143,7 +131,7 @@ public class GameManager : MonoBehaviour
         
     }
 
-    private List<Vector2> SetTubePosition(int tubeNeedSpawn)
+    public List<Vector2> SetTubePosition(int tubeNeedSpawn)
     {
         List<Vector2> tubePositions = new List<Vector2>();
         if (tubeNeedSpawn <= maxTubeInOneLine)
@@ -200,10 +188,80 @@ public class GameManager : MonoBehaviour
         return tubePositions;
     }
 
+    public List<Vector2> SetTubePositionForRefactoring(int tubeNeedSpawn)
+    {
+        List<Vector2> tubePositions = new List<Vector2>();
+        if (tubeNeedSpawn <= maxTubeInOneLine)
+        {
+            tubePositions = SetTubePositionForEachRow(tubeNeedSpawn, 0, 0);
+            return tubePositions;
+        }
+
+        // spawn tube position
+        float screenHeight = Screen.height;
+        
+        int startIndex = 0;
+        // calculate rows
+        if(tubeNeedSpawn % maxTubeInOneLine == 0)
+        {
+            rows = tubeNeedSpawn / maxTubeInOneLine;
+            Debug.Log("rows" + rows);
+        }
+
+        else
+        {
+            rows = (tubeNeedSpawn / maxTubeInOneLine) + 1;
+            Debug.Log("rows" + rows);
+        }
+
+        // calculate yposition for each row
+        float rowHeight = screenHeight / (rows + 1);
+
+        List<Vector2> yPositionList = new List<Vector2>();
+        for (int i = 1; i<= rows; i++)
+        {
+            yPositionList.Add(mainCamera.ScreenToWorldPoint(new Vector2(0, rowHeight * i)));
+            Debug.Log("yposlist count" + yPositionList.Count);
+            Debug.Log(yPositionList[i-1]);
+        }
+
+
+        int remainingTube = tubeNeedSpawn;
+        int index = 0;
+        // spawn tube base on calculated position
+        while (remainingTube > 0)
+        {
+            int lineOneTube;
+
+
+            if (remainingTube % rows != 0)
+            {
+                lineOneTube = (remainingTube / rows) + 1;
+            }
+
+            else
+            {
+                lineOneTube = remainingTube / rows;
+            }
+            Debug.Log("tube in 1 line" + lineOneTube + "line index " + index);
+            float spawnY = yPositionList[index].y;
+            tubePositions.AddRange(SetTubePositionForEachRow(lineOneTube, spawnY, startIndex));
+            index++;
+            remainingTube -= lineOneTube;
+            rows -= 1;
+            if (remainingTube > 0)
+            {
+                startIndex = tubeNeedSpawn - lineOneTube + 1;
+            }
+
+        }
+        return tubePositions;
+    }
+
     private List<Vector2> SetTubePositionForEachRow(int tubeNeedSpawn, float spawnY, int startIndex)
     {
         List<Vector2> tubePostitions = new List<Vector2>();
-        xSpacing = CalculateSpacing(tubeNeedSpawn);
+        xSpacing = CalculateSpacing(levelData);
         float screenHalfWidth = mainCamera.aspect * mainCamera.orthographicSize;
         // calculate spacing between tube based on screen size
         for (int i = 0; i < tubeNeedSpawn; i++)
@@ -267,13 +325,7 @@ public class GameManager : MonoBehaviour
 
             case GameState.OnFallingBallCompleted:
                 {
-                    
-                    if (IsCompleteLevel())
-                    {
-                        gameState = GameState.OnWin;
-                    }
-                    else gameState = GameState.NONE;
-                    
+                    gameState = GameState.NONE;
                 }
                 break;
 
@@ -302,13 +354,6 @@ public class GameManager : MonoBehaviour
             case GameState.OnGetBallBackCompleted:
                 {
                     gameState = GameState.NONE;
-                }
-                break;
-
-            case GameState.OnWin:
-                {
-                    gameState = GameState.NONE;
-                    // gọi LevelManager Onwin complete level and save playerpref
                 }
                 break;
         }
@@ -375,9 +420,10 @@ public class GameManager : MonoBehaviour
         gameState = GameState.OnGetBallBack;
     }
     
-    private float CalculateSpacing(int tubeNumber)
+    private float CalculateSpacing(LevelData level)
     {
-        float xSpacingInPixels = (Screen.width - (tubePrefabs[0].transform.localScale.x * tubeNumber)) / tubeNumber;
+        var tubeNumber = levelData.fields[0].tubes.Count;
+        float xSpacingInPixels = (Screen.width - (tubePrefabs[0].localScale.x * tubeNumber)) / tubeNumber;
         Vector3 xspacing = mainCamera.ScreenToWorldPoint(new Vector3(xSpacingInPixels, 0, 0));
         Vector3 screenWidthBottomLeft = mainCamera.ScreenToWorldPoint(new Vector3(0, 0, 0));
         float xSpacing = Vector3.Distance(screenWidthBottomLeft, xspacing);
@@ -440,15 +486,17 @@ public class GameManager : MonoBehaviour
         if (TubesNumberAfterAdd == runtimeListTube.Count ) return;
         subTubePoses = SetTubePosition(TubesNumberAfterAdd);
         Tube tube = Tube.Create(tubePrefabs[0], subTubePoses[subTubePoses.Count - 1], TubesNumberAfterAdd - 1);
-        tube.InitBallPos();
+        tube.transform.SetParent(this.transform);
+        tube.InitBallPos(tube.testingSprite);
         runtimeListTube.Add(tube);
         RepositionTubes();
     }
 
     private void RepositionTubes()
     {
-        for (int i = 0; i< runtimeListTube.Count - 1; i++)
+        for (int i = 0; i< runtimeListTube.Count -1; i++)
         {
+            Debug.Log($"tube num {i} repositioned");
             runtimeListTube[i].Reposition(subTubePoses[i]);
         }
     }
@@ -473,17 +521,7 @@ public class GameManager : MonoBehaviour
         else return false;
     }
 
-    //check level complete and make a popup 
-    //public void NextLevel()
-    //{
-    //    currentLevel++;
-    //    levelData = LoadingManager.LoadLevel(currentLevel, levelData);
-    //    ResetLevel();
-    //    LoadLevel(currentLevel);
-    //    gameState = GameState.NONE;
-    //    levelState = LevelState.Playing;
-    //}
-
+    //check level complete and make a popup
     public void ResetLevel()
     {
         foreach(var tube in runtimeListTube)
@@ -499,7 +537,4 @@ public class GameManager : MonoBehaviour
         subTubePoses.Clear();
         Destroy(gameObject);
     }
-
-    
-
 }    

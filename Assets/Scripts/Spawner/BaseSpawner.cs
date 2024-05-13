@@ -78,7 +78,7 @@ public abstract class BaseSpawner<T> : MonoBehaviour
     public List<Transform> prefabs;
 
     public int spawnedCount = 0;
-
+    protected List<T> list = new List<T>();
 
     public Transform Spawn(Transform prefab, Vector3 spawnPos, Quaternion rotation)
     {

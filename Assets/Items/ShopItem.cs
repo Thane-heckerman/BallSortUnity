@@ -4,71 +4,86 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DataStorage;
-
 public class ShopItem : Item, IColectable
 {
-    protected int costAmount = 175;
+    [SerializeField] private ShopItemSO shopItemSO;
+    public int costAmount;
     private Image img;
     [SerializeField] private GameObject ownedGameObject;
+
     public static event EventHandler<OnPreviewValueChangedEventArgs> OnPreviewValueChanged;
     public class OnPreviewValueChangedEventArgs
     {
         public int value;
         public int cost;
-    }
-
-    [SerializeField] private int index;
-
-    public int Index
-    {
-        get { return index; }
-        set { index = value; }
+        public bool ownedStatus;
     }
 
     void OnEnable()
     {
+        
+    }
+
+    void OnDisable()
+    {
+    }
+    private void Start()
+    {
         GetComponent<Button>().onClick.AddListener(() =>
         {
+            if (isOwned)
+            {
+                SetActiveBallType(Index);
+            }
             ShopUIPreview.Instance.UpdateSprite(Index);
             OnPreviewValueChanged?.Invoke(this, new OnPreviewValueChangedEventArgs
             {
                 value = Index,
-                cost = costAmount
-            }) ;
+                cost = costAmount,
+                ownedStatus = isOwned
+            });
         });
     }
-
     public void SetSprite()
     {
         IColorableComponent icolorableComponent = GetComponent<IColorableComponent>();
         transform.Find("sprite").GetComponent<Image>().sprite = icolorableComponent.GetRandomSpriteInAList(Index);
     }
 
-    protected override void Awake()
+    public void Init()
     {
-        item.SetItemKey(Index.ToString());
+        SetItemKey();
+        Debug.Log("item" + Index + ItemKey);
+        GetItemInfo();
+        
+        SetSprite();
+    }
+
+    private void GetItemInfo()
+    {
+        costAmount = shopItemSO.costAmount;
+    }
+
+    private void SetItemKey()
+    {
+        ItemKey = string.Format($"{item.itemType}_{Index}");
     }
 
     public void Collect()
     {
-        if (UIShopManager.Instance.coinsOwned >= costAmount)
-        {
-            UIShopManager.Instance.Spend(costAmount);
-            isOwned = true;
-            UpdateStatus();
-        }
-        else Debug.Log("not enough coin");
+        isOwned = true;
+        UpdateStatus();
     }
 
     public void UpdateStatus()
     {
-        if(Index == GameData.Get("ACTIVE_BALL_LIST",0)) {
-            ownedGameObject.SetActive(true);
-            Debug.Log("index = " + Index + "active ball type = " + GameData.Get("ACTIVE_BALL_LIST", 0));
-        }
-        else
-        {
-            ownedGameObject.SetActive(isOwned);
-        }
+        ownedGameObject.SetActive(isOwned);
     }
+
+
+    private void SetActiveBallType(int index)
+    {
+        GameData.Set("ACTIVE_BALL_LIST", index);
+    }
+
 }

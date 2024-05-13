@@ -3,85 +3,85 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Unity.VisualScripting;
+using System;
 
 public class Counter : MonoBehaviour
 {
+    public static Counter Instance
+    {
+        get ; private set;
+    }
     private TextMeshProUGUI txt;
     private LevelData levelData;
-    public int lastTime = 0;
-    public int startTime;
+    private  float lastTime ;
+    private float startTime;
     private int minutes;
+    public  System.Action CompleteCountDownCallBack;
+    private float remainingTime;
 
     private void Awake()
     {
-        txt = GetComponent<TextMeshProUGUI>();
+        Instance = this;
+    }
+
+
+    public float GetRemainingTime()
+    {
+        return remainingTime;
+    }
+
+    private void SetRemainingTime()
+    {
+        remainingTime = (startTime - lastTime) / 60F;
+    }
+
+    private void SetLasTime(float time)
+    {
+        lastTime = time;
+    }// for testing
+    private void OnDisable()
+    {
+
     }
 
     private void OnEnable()
     {
-        LevelManager.OnStartGame += OnStartGame;
-        LevelManager.OnCompleteLevel += LevelManager_OnCompleteLevel;    
+         
     }
 
-    private void LevelManager_OnCompleteLevel()
+    private void ResetTime()
     {
-        StopCoroutine(CountDown());
-        lastTime = minutes;
+        lastTime = 0;
+        startTime = 0;
+        //minutes = 0;
     }
 
-    public int GetRemainingTime()
+    public void UpdateText(TextMeshProUGUI txt , float time)
     {
-        return lastTime;
-    }
-
-    public int GetTimePassedInMinutes()
-    {
-        return startTime - GetRemainingTime();
-    }
-
-    private void OnDisable()
-    {
-        LevelManager.OnStartGame -= OnStartGame;
-        LevelManager.OnCompleteLevel -= LevelManager_OnCompleteLevel;
-    }
-    private void OnStartGame()
-    {
-        levelData = LevelManager.Instance.levelData;
-        startTime = Mathf.FloorToInt(levelData.timeLimit/60F);
-        Enable();
-    }
-
-    public void SetEnable(bool enable)
-    {
-        gameObject.SetActive(enable);
-    }
-
-    private void Enable()
-    {
-         StartCoroutine(CountDown());
-    }
-
-
-    private void UpdateText()
-    {
-        minutes = Mathf.FloorToInt(levelData.timeLimit / 60F);
-        var seconds = Mathf.FloorToInt(levelData.timeLimit - minutes * 60);
+        minutes = Mathf.FloorToInt(time / 60F);
+        var seconds = Mathf.FloorToInt(time - minutes * 60);
         txt.text = "" + $"{minutes:00}:{seconds:00}";
-        //txt.text = levelData.timeLimit.ToString();
     }
 
-    IEnumerator CountDown()
+    public IEnumerator CountDown(float time, Func<bool> condition, Action<float> UpdateTextDuringCountDownCoroutine = null)
     {
-        while (true)
+        startTime = time;
+        while (time > 0)
         {
-            UpdateText();
-            levelData.timeLimit--;
-            if(GameManager.Instance.IsCompleteLevel())
+            time--;
+            UpdateTextDuringCountDownCoroutine?.Invoke(time);
+            if (condition())
             {
+                SetLasTime(time);
+                SetRemainingTime();
+                //OnStopCountDown?.Invoke(this, EventArgs.Empty);
+                CompleteCountDownCallBack();
                 yield break;
             }
             yield return new WaitForSeconds(1f);
         }
-
+        //CompleteCountDownCallBack();
     }
+
+
 }

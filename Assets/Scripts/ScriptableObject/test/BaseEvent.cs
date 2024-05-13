@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
+
 [CreateAssetMenu]
 public class BaseEvent : ScriptableObject
 {
@@ -27,7 +30,7 @@ public class BaseEvent : ScriptableObject
     }
 }
 
-public class BaseEvent<TType> : ScriptableObject
+public class  BaseEvent<TType> : ScriptableObject
 {
     private List<IEventListener<TType>> eventListeners = new List<IEventListener<TType>>();
 
@@ -49,5 +52,24 @@ public class BaseEvent<TType> : ScriptableObject
     {
         if (eventListeners.Contains(listener))
             eventListeners.Remove(listener);
+    }
+}
+[CustomEditor(typeof(BaseEvent), true)]
+public class BaseEventEditor : Editor
+{
+    BaseEvent baseEvent;
+
+    void OnEnable()
+    {
+        baseEvent = target as BaseEvent;
+    }
+
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+        if (GUILayout.Button("Raise"))
+        {
+            baseEvent.Raise();
+        }
     }
 }

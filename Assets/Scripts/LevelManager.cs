@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using DataStorage;
+using System.Linq;
 
 public enum LevelState
 {
@@ -37,9 +38,11 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private Transform counter;
     [SerializeField] private PopupManager popupManager;
     private int stars;
-
+    public float timePass;
+    public GameManager GameManager { get { return gameManager; } }
     public LevelData levelData;
     public GameObject levelsMap;
+    private bool openGiftPanel;
     private LevelState levelState;
     public LevelState LevelState
     {
@@ -53,8 +56,7 @@ public class LevelManager : MonoBehaviour
             switch (value)
             {
                 case LevelState.Map:
-                    ToggleGameUI(false);
-                    EnableMap(true);
+                    LevelMapManager.Instance.EnableMap(true);
                     OnLoadSceneComplete.Raise();
                     break;
                 case LevelState.Prepare:
@@ -67,7 +69,6 @@ public class LevelManager : MonoBehaviour
                     //}
                     break;
                 case LevelState.Playing:
-                    Debug.Log("level" + LevelID);
                     //PlaySoung();
                     break;
                 case LevelState.Pausing:
@@ -75,10 +76,9 @@ public class LevelManager : MonoBehaviour
                     break;
 
                 case LevelState.Complete:
-                    stars = SetLevelStars();
+                    SetLevelStars();
                     CompleteLevel(currentLevel,stars);
                     OnCompleteLevel?.Invoke();
-                    // save playerpref data
                     break;
             }
         }
@@ -95,6 +95,7 @@ public class LevelManager : MonoBehaviour
         get => GameData.Get(LEVEL_ID_KEY, "");
         set => GameData.Set(LEVEL_ID_KEY, value);
     }
+
     public int GetStarCount(string id) => GameData.Get($"Level_{id}_StarCount", 0);
     public void SetStarCount(string id, int count) => GameData.Set($"Level_{id}_StarCount", count);
 
@@ -128,19 +129,20 @@ public class LevelManager : MonoBehaviour
 
     IEnumerator PrepareLevel(int number)
     {
+        Debug.Log("level clicked " + number);
         levelLoaded = false;
         score = 0;
         step = 0;
         yield return new WaitForSeconds(.3f);
-        EnableMap(false);
+        LevelMapManager.Instance.EnableMap(false);
         levelChangeEvent.Raise(new ChangeLevelData
         {
             isEnable = false,
             conditions = () => true
         });
-        yield return new WaitForSeconds(1.3f);
+        yield return new WaitForSeconds(2.3f);
         LoadLevel(number);
-        ToggleGameUI(true);
+
         levelLoaded = true;
     }
 
@@ -162,8 +164,9 @@ public class LevelManager : MonoBehaviour
         gameManager  = gameFieldGO.GetComponent<GameManager>();
         gameFieldGO.GetComponent<GameManager>().levelData = levelData;
         gameFieldGO.GetComponent<GameManager>().InitGameField();
+        levelState = LevelState.Playing;
+        ToggleGameUI(true);
         OnStartGame?.Invoke();
-
         //OnSceneLoadDone.Raise();
     }
 
@@ -175,31 +178,38 @@ public class LevelManager : MonoBehaviour
         GameData.Save();
     }
 
-    public void EnableMap(bool enable)
+    public void NextLevel()
     {
-        popupManager.ToggleUILevelSelector(enable);
-        levelsMap.gameObject.SetActive(!enable);
-        levelsMap.gameObject.SetActive(enable);
+        popupManager.TogglePanel(GameScenePopup.popupWin, false);
+        currentLevel++;
+        LevelID = currentLevel.ToString();
+        GameManager.Instance.ResetLevel();
+        LevelState = LevelState.Prepare;
+    }
+
+    public void ToggleLevelMaps(bool enable)
+    {
+        levelsMap.GetComponent<LevelMapManager>().ToggleLevels(enable);
     }
 
     private void ToggleGameUI(bool enable)
     {
-        popupManager.ToggleGameUI(enable);
+        popupManager.TogglePanel(GameScenePopup.GameUI, enable);
     }
 
-    public int SetLevelStars()
+    public void SetLevelStars()
     {
+        GetTimePassed();
         stars = 0;
 
         for (int i = 3; i >= 1; i--)
         {
-            if (counter.GetComponent<Counter>().GetTimePassedInMinutes() <= i)
+            if (timePass <= i)
             {
-                Debug.Log("time left" + counter.GetComponent<Counter>().GetTimePassedInMinutes());
                 stars++;
             }
         }
-        return stars;
+        Debug.Log(stars);
     }
 
     public int GetLevelStarsAfterCompleted()
@@ -209,8 +219,13 @@ public class LevelManager : MonoBehaviour
 
     public void BackToMap()
     {
-        gameManager.ResetLevel();
+        //if (gameManager != null) gameManager.ResetLevel(); // if there is a spawned Game
         LevelState = LevelState.Map;
+    }
+
+    private void GetTimePassed()
+    {
+        timePass = Counter.Instance.GetRemainingTime();
     }
 
 }

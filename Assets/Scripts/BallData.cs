@@ -6,16 +6,21 @@ using System;
 [System.Serializable]
 public class BallData
 {
-
-    public BallColor color;
-    //public BallColor Color
-    //{
-    //    get { return color; }
-    //    set
-    //    {
-    //        color = value;
-    //    }
-    //}
+    public static event EventHandler<OnBallColorValueChangeEventArgs> OnBallColorValueChange;
+    public class OnBallColorValueChangeEventArgs
+    {
+        public BallColor color;
+    }
+    private BallColor color;
+    public BallColor Color
+    {
+        get { return color; }
+        set
+        {
+            color = value;
+            OnBallColorValueChange?.Invoke(this, new OnBallColorValueChangeEventArgs() { color = value, });
+        }
+    }
     public BallTypeSO ballType;
     public int index;
     public Transform position;

@@ -12,15 +12,16 @@ public enum TubeState {
 
 public class Tube : MonoBehaviour
 {
+    [SerializeField] private ParticleSystem completeTubeParticle;
     public Tube tube;
     public TubeState tubeState;
     private Rigidbody2D rb2d;
     public Sprite testingSprite;
     public int index;
     private GameObject tubeGO;
-    private int maxBallInTube = 4;
+    protected int maxBallInTube = 4;
     public TubeData tubeData;
-    private List<BallPos> ballPosList = new List<BallPos>();
+    public List<BallPos> ballPosList = new List<BallPos>();
     [SerializeField] private Transform lastBallPos;
     [SerializeField] private Transform upBallPos;
     private bool canReceiveBall;
@@ -35,7 +36,7 @@ public class Tube : MonoBehaviour
         tube.SetGameObject(tubeGO);
         return tube;
     }
-    private void Awake()
+    protected virtual void Awake()
     {
         rb2d = GetComponent<Rigidbody2D>();
         lastBallPos.gameObject.SetActive(false);
@@ -204,7 +205,7 @@ public class Tube : MonoBehaviour
         return ballPosList;
     }
 
-    private bool HasBall()
+    public bool HasBall()
     {
         return GetAllBallInTubeCount() != 0;
     }
@@ -255,6 +256,7 @@ public class Tube : MonoBehaviour
         if (ballList.Count == 4)
         {
             tubeData.isCompleted = true;
+            PlayParticles();
         }
     }
 
@@ -282,5 +284,10 @@ public class Tube : MonoBehaviour
             else return balls;
         }
         return balls;
+    }
+
+    public void PlayParticles()
+    {
+        completeTubeParticle.Play();
     }
 }
