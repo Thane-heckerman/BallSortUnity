@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +9,6 @@ public class ItemPerLevelEditor : EditorWindow
 
     private static GameObject prefab;
     private static int numLevel;
-    [MenuItem("BallSort/ItemPerLevelEditor")]
 
     public static void ShowWindow()
     {
@@ -43,3 +43,4 @@ public class ItemPerLevelEditor : EditorWindow
         }
     }
 }
+#endif

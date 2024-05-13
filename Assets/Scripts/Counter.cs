@@ -17,6 +17,7 @@ public class Counter : MonoBehaviour
     private float startTime;
     private int minutes;
     public  System.Action CompleteCountDownCallBack;
+    public System.Action TimeOutCallBack;
     private float remainingTime;
 
     private void Awake()
@@ -29,6 +30,7 @@ public class Counter : MonoBehaviour
     {
         return remainingTime;
     }
+
 
     private void SetRemainingTime()
     {
@@ -80,7 +82,7 @@ public class Counter : MonoBehaviour
             }
             yield return new WaitForSeconds(1f);
         }
-        //CompleteCountDownCallBack();
+        TimeOutCallBack();
     }
 
 

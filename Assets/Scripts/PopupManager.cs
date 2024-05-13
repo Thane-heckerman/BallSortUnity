@@ -9,11 +9,13 @@ using static System.Net.Mime.MediaTypeNames;
 
 public enum GameScenePopup
 {
+    None,
     popupWin,
     popupReward,
     levelSelectorPanel,
     ShopUI,
     GameUI,
+    LosePanel,
 }
 public class PopupManager : MonoBehaviour
 {
@@ -24,6 +26,8 @@ public class PopupManager : MonoBehaviour
     [SerializeField] private GameObject levelSelectorPanel;
     [SerializeField] private GameObject ShopUI;
     [SerializeField] private GameObject GameUI;
+
+    [SerializeField] private GameObject losePanel;
     private int totalStars;
     public List<GameObject> popupList;
     public GameScenePopup popup;
@@ -118,37 +122,14 @@ public class PopupManager : MonoBehaviour
             case GameScenePopup.GameUI:
                 TogglePopup(GameUI, enable);
                 break;
+
+            case GameScenePopup.LosePanel:
+                TogglePopup(losePanel, enable);
+                break;
         }
     }
 
-    private bool CanOpenGiftPanel()
-    {
-        Debug.Log("checker openGiftPanel");
-        if (totalStars == 0)
-        {
-            totalStars = CheckTotalStarCount();
-            return false;
-        }
-        if (CheckTotalStarCount() != totalStars && CheckTotalStarCount() % 6 == 0)
-        {
-            return true;
-        }
-        else return false;
-    }
 
-    private int CheckTotalStarCount()
-    {
-        var starsCount = 0;
-        for (var i = 0; i <= LevelMapManager.Instance.LevelCount; i++)
-        {
-            if (MapProgressManager.GetLevelStarCount(i + 1) != 0)
-            {
-                totalStars += MapProgressManager.GetLevelStarCount(i + 1);
-            }
-            else break;
-        }
-        return starsCount;
-    }
 
     //private void ResetCurrentActivePopup()
     //{

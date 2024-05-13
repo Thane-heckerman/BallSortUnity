@@ -13,6 +13,15 @@ public class WinPanelCtrl : MonoBehaviour
         PopupManager.OnPopupAppered += PopupManager_OnPopupAppered;
     }
 
+    private void OnEnable()
+    {
+
+    }
+
+    private void OnDisable()
+    {
+        ToggleAllStar(true);
+    }
     private void OnDestroy()
     {
         PopupManager.OnPopupAppered -= PopupManager_OnPopupAppered;
@@ -22,7 +31,6 @@ public class WinPanelCtrl : MonoBehaviour
     {
         StartCoroutine(StarsAppear(LevelManager.Instance.GetLevelStarsAfterCompleted()));
         levelText.text = "Level" + " " + LevelManager.Instance.GetCurrentLevel();
-        StopCoroutine("StarsAppear");
     }
 
     public IEnumerator StarsAppear(int number)
@@ -45,5 +53,13 @@ public class WinPanelCtrl : MonoBehaviour
             yield return new WaitForSeconds(0.45f);
         }
         yield return null;
+    }
+
+    private void ToggleAllStar(bool enable)
+    {
+        for (int i = 0; i < stars.transform.childCount; i++)
+        {
+            stars.transform.GetChild(i).Find("inactive").gameObject.SetActive(enable);
+        }
     }
 }

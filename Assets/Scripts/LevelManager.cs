@@ -13,6 +13,7 @@ public enum LevelState
     Playing,
     Pausing,
     Complete,
+    Lost,
 }
 
 public class ChangeLevelData
@@ -31,6 +32,8 @@ public class LevelManager : MonoBehaviour
     public static event GameStateEvent OnStartGame;
     public static event GameStateEvent OnCompleteLevel;
     public static event GameStateEvent OnLevelLoaded;
+
+    public static event GameStateEvent OnLevelLose;
     public bool levelLoaded;
     public static int currentLevel;
     private GameManager gameManager;
@@ -79,6 +82,10 @@ public class LevelManager : MonoBehaviour
                     SetLevelStars();
                     CompleteLevel(currentLevel,stars);
                     OnCompleteLevel?.Invoke();
+                    break;
+                case LevelState.Lost:
+                    PopupManager.Instance.TogglePanel(GameScenePopup.LosePanel, true);
+                    OnLevelLose?.Invoke();
                     break;
             }
         }
@@ -204,7 +211,7 @@ public class LevelManager : MonoBehaviour
 
         for (int i = 3; i >= 1; i--)
         {
-            if (timePass <= i)
+            if ((int)timePass <= i)
             {
                 stars++;
             }
@@ -227,6 +234,13 @@ public class LevelManager : MonoBehaviour
     {
         timePass = Counter.Instance.GetRemainingTime();
     }
-
+    private void RestartLevel()
+    {
+        if (GameManager != null)
+        {
+            GameManager.Instance.ResetLevel();
+        }
+        levelState = LevelState.Prepare;
+    }
 }
 

@@ -54,6 +54,7 @@ public class  BaseEvent<TType> : ScriptableObject
             eventListeners.Remove(listener);
     }
 }
+#if UNITY_EDITOR
 [CustomEditor(typeof(BaseEvent), true)]
 public class BaseEventEditor : Editor
 {
@@ -72,4 +73,6 @@ public class BaseEventEditor : Editor
             baseEvent.Raise();
         }
     }
+
 }
+#endif
